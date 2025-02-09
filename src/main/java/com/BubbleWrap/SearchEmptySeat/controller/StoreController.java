@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/store")
@@ -20,9 +21,10 @@ public class StoreController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> registerStore(@RequestBody StoreRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> registerStore(@RequestBody StoreRequest request) {
         return storeService.registerStore(request);
     }
+
 
     @GetMapping("/my")
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getUserStores() {

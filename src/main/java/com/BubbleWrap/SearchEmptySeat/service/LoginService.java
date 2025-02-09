@@ -1,6 +1,7 @@
 package com.BubbleWrap.SearchEmptySeat.service;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
@@ -29,10 +30,10 @@ public class LoginService {
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<String>> registerUser(SignUpRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> registerUser(SignUpRequest request) {
         Optional<Member> existingUser = memberRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("이미 존재하는 이메일입니다."));
+            return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.EMAIL_ALREADY_EXISTS.getCode(), ErrorCode.EMAIL_ALREADY_EXISTS.getMessage()));
         }
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -47,21 +48,29 @@ public class LoginService {
 
         memberRepository.save(newUser);
 
-        return ResponseEntity.ok(ApiResponse.success("회원가입이 완료되었습니다."));
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("email", newUser.getEmail());
+        responseData.put("name", newUser.getName());
+        responseData.put("phone", newUser.getPhone());
+        responseData.put("location", newUser.getLocation());
+        responseData.put("role", newUser.getUserType().name());
+
+        return ResponseEntity.ok(ApiResponse.success(responseData, "Membership registration successful"));
     }
+
+
+
 
     public ResponseEntity<ApiResponse<Map<String, String>>> loginUser(LoginRequest request) {
         Member user = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않거나 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.USER_NOT_FOUND.getMessage()));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("아이디가 존재하지 않거나 비밀번호가 일치하지 않습니다."));
+            return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS.getCode(), ErrorCode.INVALID_CREDENTIALS.getMessage()));
         }
 
-        // JWT 토큰 생성
         String token = jwtUtil.generateToken(user.getEmail(), user.getUserType().name());
 
-        // 응답 데이터 구성
         Map<String, String> responseData = new HashMap<>();
         responseData.put("email", user.getEmail());
         responseData.put("name", user.getName());
@@ -69,6 +78,6 @@ public class LoginService {
         responseData.put("role", user.getUserType().name());
         responseData.put("token", token);
 
-        return ResponseEntity.ok(ApiResponse.success(responseData));
+        return ResponseEntity.ok(ApiResponse.success(responseData, "Login Success"));
     }
 }

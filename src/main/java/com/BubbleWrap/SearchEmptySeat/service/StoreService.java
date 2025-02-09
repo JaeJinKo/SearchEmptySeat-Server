@@ -1,6 +1,7 @@
 package com.BubbleWrap.SearchEmptySeat.service;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.store.StoreRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.store.StoreResponse;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
@@ -9,13 +10,15 @@ import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,12 +35,12 @@ public class StoreService {
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<String>> registerStore(StoreRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> registerStore(StoreRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
         Member owner = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.USER_NOT_FOUND.getMessage()));
 
         Store store = new Store();
         store.setOwner(owner);
@@ -48,12 +51,25 @@ public class StoreService {
         store.setBank(request.getBank());
         store.setAccountNumber(request.getAccountNumber());
         store.setDepositor(request.getDepositor());
+        store.setCategory(request.getCategory());
         store.setBusinessHours(request.getBusinessHours());
         store.setImage(request.getImage());
-        store.setCategory(request.getCategory());
 
         storeRepository.save(store);
-        return ResponseEntity.ok(ApiResponse.success("가게 등록이 완료되었습니다."));
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("storeName", store.getStoreName());
+        responseData.put("location", store.getLocation());
+        responseData.put("description", store.getDescription());
+        responseData.put("businessRegistrationNumber", store.getBusinessRegistrationNumber());
+        responseData.put("bank", store.getBank());
+        responseData.put("accountNumber", store.getAccountNumber());
+        responseData.put("depositor", store.getDepositor());
+        responseData.put("businessHours", store.getBusinessHours());
+        responseData.put("image", store.getImage());
+        responseData.put("category", store.getCategory());
+
+        return ResponseEntity.ok(ApiResponse.success(responseData, "Store registration successful"));
     }
 
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getUserStores() {
@@ -61,7 +77,7 @@ public class StoreService {
         String email = authentication.getName();
 
         Member owner = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.USER_NOT_FOUND.getMessage()));
 
         List<Store> stores = storeRepository.findByOwnerUserId(owner.getUserId());
 
@@ -69,7 +85,7 @@ public class StoreService {
                 .map(store -> new StoreResponse(store, objectMapper))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(response, "View My Stores"));
     }
 
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
@@ -78,14 +94,14 @@ public class StoreService {
                 .map(store -> new StoreResponse(store, objectMapper))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(response, "View All Stores"));
     }
 
     public ResponseEntity<ApiResponse<StoreResponse>> getStoreById(Long storeId) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 가게를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.STORE_NOT_FOUND.getMessage()));
 
-        return ResponseEntity.ok(ApiResponse.success(new StoreResponse(store, objectMapper)));
+        return ResponseEntity.ok(ApiResponse.success(new StoreResponse(store, objectMapper), "View Store By Id"));
     }
 
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(String category) {
@@ -97,10 +113,9 @@ public class StoreService {
                     .map(store -> new StoreResponse(store, objectMapper))
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(ApiResponse.success(response));
+            return ResponseEntity.ok(ApiResponse.success(response, "View Stores By Category"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("유효하지 않은 카테고리입니다. 올바른 값: " + StoreCategory.values()));
+            return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_CATEGORY.getCode(), ErrorCode.INVALID_CATEGORY.getMessage()));
         }
     }
-
 }

@@ -21,7 +21,7 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> register(@RequestBody SignUpRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody SignUpRequest request) {
         return loginService.registerUser(request);
     }
 

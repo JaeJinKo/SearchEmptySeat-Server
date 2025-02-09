@@ -1,6 +1,7 @@
 package com.BubbleWrap.SearchEmptySeat.exception;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,18 +10,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // IllegalArgumentException 처리 (잘못된 입력값)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+        return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_ARGUMENT.getCode(), ErrorCode.INVALID_ARGUMENT.getMessage()));
     }
 
+    // 유효하지 않은 요청 데이터 (DTO @Valid 실패)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<String>> handleValidationException(MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 유효하지 않습니다."));
+        return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_INPUT.getCode(), ErrorCode.INVALID_INPUT.getMessage()));
     }
 
+    // 예상하지 못한 서버 오류 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGeneralException(Exception ex) {
-        return ResponseEntity.internalServerError().body(ApiResponse.error("서버 오류가 발생했습니다."));
+        return ResponseEntity.internalServerError().body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR.getCode(), ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
     }
 }
