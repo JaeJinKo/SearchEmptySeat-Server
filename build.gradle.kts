@@ -32,6 +32,19 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.springframework.boot:spring-boot-starter-security") // Spring Security
+	implementation("io.jsonwebtoken:jjwt-api:0.11.5") // JWT 라이브러리
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa") // JPA
+	implementation("org.springframework.boot:spring-boot-starter-validation") // 입력 검증
+	implementation("com.fasterxml.jackson.core:jackson-databind") // JSON 처리
+	runtimeOnly("org.postgresql:postgresql") // PostgreSQL (DB에 따라 변경)
+	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+	implementation("org.flywaydb:flyway-core:9.22.0")
+	implementation("org.postgresql:postgresql")
+	testCompileOnly("org.projectlombok:lombok")
+	testAnnotationProcessor("org.projectlombok:lombok")
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 tasks.withType<Test> {
