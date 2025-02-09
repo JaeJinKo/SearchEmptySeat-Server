@@ -31,8 +31,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // 로그인, 회원가입은 모두 허용
-                        .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN") // 관리자만 접근 가능
+                        .requestMatchers("/api/auth/**").permitAll()// 로그인, 회원가입은 모두 허용
+                        .requestMatchers("/store/register", "/store/my").hasRole("OWNER")
+                        .requestMatchers("/store/all", "/store/{storeId}", "/store/category/{category}").hasAnyRole("USER", "OWNER")
+                        //.requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN") // 관리자만 접근 가능
                         //.requestMatchers("/api/owner/**").hasAnyRole("OWNER", "SUPER_ADMIN") // 점주와 관리자만 접근 가능
                         .anyRequest().authenticated()
                 )

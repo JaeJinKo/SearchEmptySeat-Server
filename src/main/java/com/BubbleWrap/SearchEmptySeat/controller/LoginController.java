@@ -1,12 +1,14 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
-import com.BubbleWrap.SearchEmptySeat.dto.login.LoginResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.service.LoginService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,12 +21,12 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<LoginResponse> register(@RequestBody SignUpRequest request) {
+    public ResponseEntity<ApiResponse<String>> register(@RequestBody SignUpRequest request) {
         return loginService.registerUser(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> login(@Valid @RequestBody LoginRequest request) {
         return loginService.loginUser(request);
     }
 }
