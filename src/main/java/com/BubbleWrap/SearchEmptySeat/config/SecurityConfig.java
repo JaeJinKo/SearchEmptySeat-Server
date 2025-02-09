@@ -28,11 +28,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시 필요)
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // 인증 없이 접근 가능
-                        .anyRequest().authenticated() // 나머지는 인증 필요
+                        .requestMatchers("/api/auth/**").permitAll() // 로그인, 회원가입은 모두 허용
+                        .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN") // 관리자만 접근 가능
+                        //.requestMatchers("/api/owner/**").hasAnyRole("OWNER", "SUPER_ADMIN") // 점주와 관리자만 접근 가능
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

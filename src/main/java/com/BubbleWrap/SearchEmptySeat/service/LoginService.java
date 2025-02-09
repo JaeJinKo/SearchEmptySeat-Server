@@ -57,6 +57,6 @@ public class LoginService {
             throw new IllegalArgumentException("잘못된 이메일 또는 비밀번호입니다.");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(user.getEmail(), user.getUserType().name());
     }
 }
