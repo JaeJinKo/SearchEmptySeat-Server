@@ -53,7 +53,7 @@ public class LoginService {
         responseData.put("name", newUser.getName());
         responseData.put("phone", newUser.getPhone());
         responseData.put("location", newUser.getLocation());
-        responseData.put("role", newUser.getUserType().name());
+        responseData.put("userType", newUser.getUserType().name());
 
         return ResponseEntity.ok(ApiResponse.success(responseData, "Membership registration successful"));
     }
@@ -75,7 +75,7 @@ public class LoginService {
         responseData.put("email", user.getEmail());
         responseData.put("name", user.getName());
         responseData.put("phone", user.getPhone());
-        responseData.put("role", user.getUserType().name());
+        responseData.put("userType", user.getUserType().name());
         responseData.put("token", token);
 
         return ResponseEntity.ok(ApiResponse.success(responseData, "Login Success"));
