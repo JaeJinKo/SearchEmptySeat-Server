@@ -1,5 +1,6 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
+import com.BubbleWrap.SearchEmptySeat.dto.login.LoginResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.service.LoginService;
@@ -11,21 +12,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class LoginController {
 
-    private final LoginService authService;
+    private final LoginService loginService;
 
-    public LoginController(LoginService authService) {
-        this.authService = authService;
+    public LoginController(LoginService loginService) {
+        this.loginService = loginService;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> register(@Valid @RequestBody SignUpRequest request) {
-        authService.registerUser(request);
-        return ResponseEntity.ok("signup complete");
+    public ResponseEntity<LoginResponse> register(@RequestBody SignUpRequest request) {
+        return loginService.registerUser(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request) {
-        String token = authService.loginUser(request);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        return loginService.loginUser(request);
     }
 }
