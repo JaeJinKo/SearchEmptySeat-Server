@@ -1,6 +1,7 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.login.FindPasswordRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.service.LoginService;
@@ -28,5 +29,10 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, String>>> login(@Valid @RequestBody LoginRequest request) {
         return loginService.loginUser(request);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Map<String, String>>> forgotPassword(@RequestBody FindPasswordRequest request){
+        return loginService.resetPassword(request);
     }
 }

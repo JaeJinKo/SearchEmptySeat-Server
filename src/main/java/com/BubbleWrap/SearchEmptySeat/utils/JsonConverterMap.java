@@ -1,5 +1,6 @@
-package com.BubbleWrap.SearchEmptySeat.Converter;
+package com.BubbleWrap.SearchEmptySeat.utils;
 
+import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
@@ -19,7 +20,7 @@ public class JsonConverterMap implements AttributeConverter<Map<String, String>,
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON 변환 오류", e);
+            throw new RuntimeException(ErrorCode.JSON_PROCESSING_ERROR.getCode() +": " + e.getMessage());
         }
     }
 
@@ -28,7 +29,7 @@ public class JsonConverterMap implements AttributeConverter<Map<String, String>,
         try {
             return objectMapper.readValue(dbData, HashMap.class);
         } catch (IOException e) {
-            throw new RuntimeException("JSON 변환 오류", e);
+            throw new RuntimeException(ErrorCode.JSON_PROCESSING_ERROR.getCode() +": " + e.getMessage());
         }
     }
 }

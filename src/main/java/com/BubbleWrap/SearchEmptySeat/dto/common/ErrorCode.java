@@ -10,14 +10,15 @@ public enum ErrorCode {
     INVALID_INPUT("ERROR-0002", "입력값이 유효하지 않습니다."),
     INVALID_ARGUMENT("ERROR-0003", "잘못된 입력값입니다."),
     JSON_PROCESSING_ERROR("ERROR-0004", "JSON 변환 중 오류가 발생했습니다."),
-    // ERROR-1000 회원 관련
+    EMAIL_SEND_ERROR("ERROR-0005", "EMAIL 전송을 실패했습니다."),
+    // ERROR-0100 회원 관련
     USER_NOT_FOUND("ERROR-1001", "사용자를 찾을 수 없습니다."),
     INVALID_CREDENTIALS("ERROR-1002", "아이디 또는 비밀번호가 올바르지 않습니다."),
     EMAIL_ALREADY_EXISTS("ERROR-1003", "이미 존재하는 이메일입니다."),
-    // ERROR-2000 가게 관련
+    // ERROR-0200 가게 관련
     STORE_NOT_FOUND("ERROR-2001","가게 ID를 찾을 수 없습니다."),
     INVALID_CATEGORY("ERROR-2002", "유효하지 않은 카테고리입니다.")
-    // ERROR-3000
+    // ERROR-0300
 
     ;
 

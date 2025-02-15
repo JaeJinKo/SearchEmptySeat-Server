@@ -10,6 +10,18 @@ spring:
     hibernate:
       ddl-auto: create # none, update, create
     show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 jwt:
   secret: "7A85359EB855E16E6AA54AFCD271C71DC329074D922303EB41BD61E3F6BD21CD"  # JWT 서명에 사용할 비밀 키
   expiration: 3600000  # 만료 시간 (1시간 = 3600000ms)
+

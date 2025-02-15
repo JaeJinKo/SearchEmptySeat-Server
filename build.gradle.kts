@@ -45,6 +45,9 @@ dependencies {
 	testCompileOnly("org.projectlombok:lombok")
 	testAnnotationProcessor("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+	implementation("io.github.cdimascio:dotenv-java:3.0.0")
+	implementation("org.springframework.boot:spring-boot-starter-mail")
+
 }
 
 tasks.withType<Test> {

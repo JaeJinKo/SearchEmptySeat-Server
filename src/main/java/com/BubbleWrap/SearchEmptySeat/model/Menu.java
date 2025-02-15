@@ -1,6 +1,6 @@
 package com.BubbleWrap.SearchEmptySeat.model;
 
-import com.BubbleWrap.SearchEmptySeat.Converter.JsonConverterList;
+import com.BubbleWrap.SearchEmptySeat.utils.JsonConverterList;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -2,11 +2,13 @@ package com.BubbleWrap.SearchEmptySeat.service;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
+import com.BubbleWrap.SearchEmptySeat.dto.login.FindPasswordRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.security.JwtUtil;
+import com.BubbleWrap.SearchEmptySeat.utils.RandomPassWord;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,13 @@ public class LoginService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final MailService mailService;
 
-    public LoginService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public LoginService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, MailService mailService) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.mailService = mailService;
     }
 
     @Transactional
@@ -79,5 +83,22 @@ public class LoginService {
         responseData.put("token", token);
 
         return ResponseEntity.ok(ApiResponse.success(responseData, "Login Success"));
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<Map<String, String>>> resetPassword(FindPasswordRequest request){
+        Member user = memberRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        String tempPassword = RandomPassWord.generateTemporaryPassword();
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        memberRepository.save(user);
+
+        String subject = "임시 비밀번호 안내";
+        mailService.sendEmail(request.getEmail(), subject, tempPassword);
+
+        Map<String, String> responseData = new HashMap<>();
+        responseData.put("email", request.getEmail());
+
+        return ResponseEntity.ok(ApiResponse.success(responseData, "Reset password successful"));
     }
 }
