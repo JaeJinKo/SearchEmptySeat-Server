@@ -1,4 +1,4 @@
-package com.BubbleWrap.SearchEmptySeat.dto.login;
+package com.BubbleWrap.SearchEmptySeat.dto.member;
 
 import com.BubbleWrap.SearchEmptySeat.model.UserType;
 import jakarta.validation.constraints.Email;

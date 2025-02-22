@@ -2,9 +2,9 @@ package com.BubbleWrap.SearchEmptySeat.service;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
-import com.BubbleWrap.SearchEmptySeat.dto.login.FindPasswordRequest;
-import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
-import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.member.FindPasswordRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.member.LoginRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.member.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.security.JwtUtil;

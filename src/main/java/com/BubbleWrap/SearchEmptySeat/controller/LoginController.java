@@ -1,9 +1,9 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
-import com.BubbleWrap.SearchEmptySeat.dto.login.FindPasswordRequest;
-import com.BubbleWrap.SearchEmptySeat.dto.login.LoginRequest;
-import com.BubbleWrap.SearchEmptySeat.dto.login.SignUpRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.member.FindPasswordRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.member.LoginRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.member.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.service.LoginService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
