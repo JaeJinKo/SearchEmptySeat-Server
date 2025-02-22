@@ -1,9 +1,13 @@
 package com.BubbleWrap.SearchEmptySeat.security;
 
 import com.BubbleWrap.SearchEmptySeat.config.JwtProperties;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
+import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -23,7 +27,7 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         if (jwtProperties.getSecret() == null || jwtProperties.getSecret().isEmpty()) {
-            throw new IllegalStateException("JWT secret key is not set properly!");
+            throw new BusinessException(ErrorCode.JWT_NOT_SET_PROPERLY);
         }
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
@@ -65,11 +69,13 @@ public class JwtUtil {
             return true;
         } catch (ExpiredJwtException e) {
             System.out.println("만료된 JWT 토큰입니다.");
+            throw new BusinessException(ErrorCode.EXPIRED_JWT);
         } catch (MalformedJwtException e) {
             System.out.println("유효하지 않은 JWT 토큰입니다.");
+            throw new BusinessException(ErrorCode.INVALID_JWT);
         } catch (Exception e) {
             System.out.println("JWT 토큰 검증 실패: " + e.getMessage());
+            throw new BusinessException(ErrorCode.JWT_VERIFICATION_FAILED);
         }
-        return false;
     }
 }

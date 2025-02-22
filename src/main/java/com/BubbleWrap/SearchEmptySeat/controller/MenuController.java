@@ -4,6 +4,7 @@ package com.BubbleWrap.SearchEmptySeat.controller;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.menu.MenuRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.menu.MenuResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.menu.OutOfStockRequest;
 import com.BubbleWrap.SearchEmptySeat.service.MenuService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,21 @@ public class MenuController {
     @GetMapping("/store/{storePK}")
     public ResponseEntity<ApiResponse<List<MenuResponse>>> getMenu(@PathVariable Long storePK){
         return menuService.getMenu(storePK);
+    }
+
+    @PutMapping("update/{menuId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateMenu(@PathVariable Long menuId, @RequestBody MenuRequest request) {
+        return menuService.updateMenu(menuId, request);
+    }
+
+    @DeleteMapping("del/{menuId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteMenu(@PathVariable Long menuId) {
+        return menuService.deleteMenu(menuId);
+    }
+
+    @PatchMapping("/outofstock")
+    public ResponseEntity<ApiResponse<List<Map<String,Object>>>> updateMenusStock(@RequestBody OutOfStockRequest request) {
+        return menuService.updateMenusStock(request);
     }
 
 }

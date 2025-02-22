@@ -9,7 +9,8 @@ import java.util.List;
 
 @Getter
 public class MenuResponse {
-    private Store store;
+
+    private Long menuPK;
 
     private String name;
 
@@ -24,7 +25,7 @@ public class MenuResponse {
     private boolean isAvailable;
 
     public MenuResponse(Menu menu, ObjectMapper objectMapper) {
-        this.store = menu.getStore();
+        this.menuPK = menu.getMenuPK();
         this.name = menu.getName();
         this.section = menu.getSection();
         this.image = menu.getImage();
