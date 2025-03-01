@@ -25,6 +25,10 @@ public enum ErrorCode {
     MENU_NOT_FOUND("ERROR-0203", "Menu not found"),
     // ERROR-0300
 
+
+    INVALID_ID("ERROR-400", "Invalid ID"),
+    NOT_FOUND("ERROR-404", "Entity Not Found"),
+
     ;
 
 
