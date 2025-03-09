@@ -1,9 +1,11 @@
 package com.BubbleWrap.SearchEmptySeat.model;
 
+import com.BubbleWrap.SearchEmptySeat.utils.JsonConverterList;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,8 +36,8 @@ public class Member {
 
     private int points = 0;
 
-    @Lob
-    private String image;
+    @Convert(converter = JsonConverterList.class)
+    private List<String> image;
 
     @Column(updatable = false)
     private LocalDateTime createdDate = LocalDateTime.now();

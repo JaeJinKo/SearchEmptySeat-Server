@@ -21,6 +21,14 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+myapp:
+  file:
+    upload-dir: ./uploads  # 상대경로
+    #upload-dir: /var/myapp/uploads  # 절대경로 예시
 jwt:
   secret: "7A85359EB855E16E6AA54AFCD271C71DC329074D922303EB41BD61E3F6BD21CD"  # JWT 서명에 사용할 비밀 키
   expiration: 3600000  # 만료 시간 (1시간 = 3600000ms)

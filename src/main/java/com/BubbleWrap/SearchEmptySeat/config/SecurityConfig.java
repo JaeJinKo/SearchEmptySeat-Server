@@ -31,10 +31,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()// 로그인, 회원가입은 모두 허용
+                        .requestMatchers("/api/auth/**", "/api/files/**").permitAll()// 로그인, 회원가입은 모두 허용
                         .requestMatchers(
                                 "/api/store/register", "api/store/my",
-                                "api/menu/add"
+                                "api/menu/add", "/api/me/{userId}"
                         ).hasRole("OWNER")
                         .requestMatchers(
                                 "/api/store/all", "/api/store/{storeId}",
