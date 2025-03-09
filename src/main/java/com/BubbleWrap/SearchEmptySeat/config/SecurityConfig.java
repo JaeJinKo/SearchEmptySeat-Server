@@ -31,14 +31,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/files/**").permitAll()// 로그인, 회원가입은 모두 허용
+                        .requestMatchers("/api/auth/**").permitAll()// 로그인, 회원가입은 모두 허용
                         .requestMatchers(
                                 "/api/store/register", "api/store/my",
                                 "api/menu/add", "/api/me/{userId}"
                         ).hasRole("OWNER")
                         .requestMatchers(
                                 "/api/store/all", "/api/store/{storeId}",
-                                "/api/store/category/{category}", "api/menu/store/{storePK}"
+                                "/api/store/category/{category}", "api/menu/store/{storePK}", "/api/files/**"
                         ).hasAnyRole("USER", "OWNER")
                         //.requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN") // 관리자만 접근 가능
                         //.requestMatchers("/api/owner/**").hasAnyRole("OWNER", "SUPER_ADMIN") // 점주와 관리자만 접근 가능
