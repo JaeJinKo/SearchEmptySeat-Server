@@ -77,6 +77,7 @@ public class LoginService {
 
         Map<String, String> responseData = new HashMap<>();
         responseData.put("email", user.getEmail());
+        responseData.put("userId", String.valueOf(user.getUserId()));
         responseData.put("name", user.getName());
         responseData.put("phone", user.getPhone());
         responseData.put("userType", user.getUserType().name());
