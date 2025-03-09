@@ -1,12 +1,12 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.member.MyInfoResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.member.MyInfoUpdateRequest;
 import com.BubbleWrap.SearchEmptySeat.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -23,5 +23,10 @@ public class MemberController {
             @ModelAttribute MyInfoUpdateRequest request
     ) {
         return memberService.updateMyInfo(userId, request);
+    }
+
+    @GetMapping("/me/{userId}")
+    public ResponseEntity<ApiResponse<MyInfoResponse>> getMyInfo(@PathVariable Long userId) {
+        return memberService.getMyInfo(userId);
     }
 }

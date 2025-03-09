@@ -2,6 +2,7 @@ package com.BubbleWrap.SearchEmptySeat.service;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
+import com.BubbleWrap.SearchEmptySeat.dto.member.MyInfoResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.member.MyInfoUpdateRequest;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
@@ -32,6 +33,19 @@ public class MemberService {
      */
     @Value("${myapp.file.upload-dir}")
     private String baseUploadDir;
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<MyInfoResponse>> getMyInfo(Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND));
+
+        MyInfoResponse response = new MyInfoResponse(member);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(response, "Get my info success")
+        );
+    }
 
     @Transactional
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateMyInfo(Long userId, MyInfoUpdateRequest request) {
