@@ -1,10 +1,9 @@
 package com.BubbleWrap.SearchEmptySeat.dto.menu;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
-
 
 @Setter
 @Getter
@@ -20,5 +19,6 @@ public class MenuRequest {
 
     private String description;
 
-    private boolean isAvailable;
+    @JsonProperty("isAvailable")
+    private boolean available;
 }

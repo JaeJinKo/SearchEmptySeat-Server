@@ -36,7 +36,8 @@ public class MenuController {
         try {
             request = objectMapper.readValue(userData, MenuRequest.class);
         } catch (JsonProcessingException e) {
-            throw new BusinessException(ErrorCode.JSON_PROCESSING_ERROR);
+            //throw new BusinessException(ErrorCode.JSON_PROCESSING_ERROR);
+            throw new RuntimeException(e);
         }
         return menuService.addMenu(request, imageFile);
     }

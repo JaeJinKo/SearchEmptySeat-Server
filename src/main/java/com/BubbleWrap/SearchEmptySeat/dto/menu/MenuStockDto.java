@@ -8,5 +8,5 @@ import lombok.Setter;
 @Getter
 public class MenuStockDto {
     private Long menuPK;
-    private boolean available;
+    private boolean isAvailable;
 }
