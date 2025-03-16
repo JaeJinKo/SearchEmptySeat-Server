@@ -25,6 +25,22 @@ public class StoreResponse {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
+    public StoreResponse(Store store) {
+        this.storePK = store.getStorePK();
+        this.storeName = store.getStoreName();
+        this.location = store.getLocation();
+        this.description = store.getDescription();
+        this.businessRegistrationNumber = store.getBusinessRegistrationNumber();
+        this.bank = store.getBank();
+        this.accountNumber = store.getAccountNumber();
+        this.depositor = store.getDepositor();
+        this.businessHours = store.getBusinessHours();
+        this.image = store.getImage();
+        this.category = store.getCategory();
+        this.createdDate = store.getCreatedDate();
+        this.updatedDate = store.getUpdatedDate();
+    }
+
     public StoreResponse(Store store, ObjectMapper objectMapper) {
         this.storePK = store.getStorePK();
         this.storeName = store.getStoreName();

@@ -9,16 +9,21 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "tbl_favorite")
+@Table(name = "tbl_favorite",
+        uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "store_id" }) })
 public class Favorite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long favoritePK;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Member user;
 
-    private Long storeID;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     private LocalDateTime favoriteDate;
 }

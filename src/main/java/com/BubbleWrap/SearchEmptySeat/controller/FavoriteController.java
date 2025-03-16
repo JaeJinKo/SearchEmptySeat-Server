@@ -1,33 +1,34 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
-import com.BubbleWrap.SearchEmptySeat.dto.favorite.FavoriteRequest;
-import com.BubbleWrap.SearchEmptySeat.dto.favorite.FavoriteResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.favorite.FavoriteResponse;
 import com.BubbleWrap.SearchEmptySeat.service.FavoriteService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/favorite")
+@RequestMapping("/api/favorites")
+@RequiredArgsConstructor
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    public FavoriteController(FavoriteService favoriteService) {
-        this.favoriteService = favoriteService;
+    @PostMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<FavoriteResponse>> addFavorite(@PathVariable Long storeId) {
+        return favoriteService.addFavorite(storeId);
     }
 
-    // POST
-    @PostMapping
-    public ResponseEntity<ApiResponse<FavoriteResponse>> createFavorite(@RequestBody FavoriteRequest request) {
-        return favoriteService.createFavorite(request);
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<String>> removeFavorite(@PathVariable Long storeId) {
+        return favoriteService.removeFavorite(storeId);
     }
 
-    // GET
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<FavoriteResponse>>> getAllFavorites() {
-        return favoriteService.getAllFavorites();
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<List<FavoriteResponse>>> getFavoriteList(@PathVariable Long userId) {
+        return favoriteService.getFavoriteList(userId);
     }
 }
