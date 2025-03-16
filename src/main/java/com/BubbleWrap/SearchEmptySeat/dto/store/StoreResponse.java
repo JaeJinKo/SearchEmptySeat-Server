@@ -24,6 +24,7 @@ public class StoreResponse {
     private List<StoreCategory> category;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+    private int viewCount;
 
     public StoreResponse(Store store) {
         this.storePK = store.getStorePK();
@@ -55,5 +56,22 @@ public class StoreResponse {
         this.category = store.getCategory();
         this.createdDate = store.getCreatedDate();
         this.updatedDate = store.getUpdatedDate();
+    }
+
+    public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount) {
+        this.storePK = store.getStorePK();
+        this.storeName = store.getStoreName();
+        this.location = store.getLocation();
+        this.description = store.getDescription();
+        this.businessRegistrationNumber = store.getBusinessRegistrationNumber();
+        this.bank = store.getBank();
+        this.accountNumber = store.getAccountNumber();
+        this.depositor = store.getDepositor();
+        this.businessHours = store.getBusinessHours();
+        this.image = store.getImage();
+        this.category = store.getCategory();
+        this.createdDate = store.getCreatedDate();
+        this.updatedDate = store.getUpdatedDate();
+        this.viewCount = viewCount;
     }
 }

@@ -8,8 +8,10 @@ import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
 import com.BubbleWrap.SearchEmptySeat.model.Store;
 import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
+import com.BubbleWrap.SearchEmptySeat.model.StoreViews;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.StoreViewsRepository;
 import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -31,8 +33,15 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
+    private final StoreViewsRepository storeViewsRepository;
     private final ObjectMapper objectMapper;
     private final FileStorageService fileStorageService;
+
+    private int getStoreViews(Long storeId) {
+        return storeViewsRepository.findByStoreStorePK(storeId)
+                .map(StoreViews::getViewCount)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_VIEWS_NOT_FOUND));
+    }
 
     @Transactional
     public ResponseEntity<ApiResponse<Map<String, Object>>> registerStore(StoreRequest request, List<MultipartFile> imageFiles) {
@@ -63,6 +72,9 @@ public class StoreService {
 
         storeRepository.save(store);
 
+        StoreViews storeViews = new StoreViews(store);
+        storeViewsRepository.save(storeViews);
+
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("storeName", store.getStoreName());
         responseData.put("location", store.getLocation());
@@ -74,6 +86,7 @@ public class StoreService {
         responseData.put("businessHours", store.getBusinessHours());
         responseData.put("image", store.getImage());
         responseData.put("category", store.getCategory());
+        responseData.put("viewCount", 0);
 
         return ResponseEntity.ok(ApiResponse.success(responseData, "Store registration successful"));
     }
@@ -141,7 +154,7 @@ public class StoreService {
         List<Store> stores = storeRepository.findByOwnerUserId(owner.getUserId());
 
         List<StoreResponse> response = stores.stream()
-                .map(store -> new StoreResponse(store, objectMapper))
+                .map(store -> new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK())))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(ApiResponse.success(response, "View My Stores"));
@@ -150,7 +163,7 @@ public class StoreService {
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
         List<Store> stores = storeRepository.findAll();
         List<StoreResponse> response = stores.stream()
-                .map(store -> new StoreResponse(store, objectMapper))
+                .map(store -> new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK())))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(ApiResponse.success(response, "View All Stores"));
@@ -160,7 +173,15 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorCode.STORE_NOT_FOUND.getMessage()));
 
-        return ResponseEntity.ok(ApiResponse.success(new StoreResponse(store, objectMapper), "View Store By Id"));
+        StoreViews storeViews = storeViewsRepository.findByStoreStorePK(storeId)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.STORE_VIEWS_NOT_FOUND.getMessage()));
+
+        storeViews.increaseViewCount();
+        storeViewsRepository.save(storeViews);
+
+        StoreResponse storeResponse = new StoreResponse(store, objectMapper, storeViews.getViewCount());
+
+        return ResponseEntity.ok(ApiResponse.success(storeResponse, "View Store By Id"));
     }
 
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(String category) {
@@ -169,7 +190,7 @@ public class StoreService {
 
             List<Store> stores = storeRepository.findByCategory(storeCategory);
             List<StoreResponse> response = stores.stream()
-                    .map(store -> new StoreResponse(store, objectMapper))
+                    .map(store -> new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK())))
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(ApiResponse.success(response, "View Stores By Category"));

@@ -30,6 +30,7 @@ public enum ErrorCode {
     UNAUTHORIZED_ACCESS("ERROR-0204", "Not the owner of the store."),
     ALREADY_FAVORITED("ERROR-0205", "This is a store that has already been added to list."),
     FAVORITE_NOT_FOUND("ERROR-0206", "The store has already been removed from list."),
+    STORE_VIEWS_NOT_FOUND("ERROR-0207", "The store view information could not be verified."),
     // ERROR-0300
 
     NOT_PUOND("ERROR-9999", "test")
