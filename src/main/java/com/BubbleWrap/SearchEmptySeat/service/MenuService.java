@@ -12,10 +12,13 @@ import com.BubbleWrap.SearchEmptySeat.model.Menu;
 import com.BubbleWrap.SearchEmptySeat.model.Store;
 import com.BubbleWrap.SearchEmptySeat.repository.MenuRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
+import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,20 +27,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class MenuService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
     private final ObjectMapper objectMapper;
-
-    public MenuService(MenuRepository menuRepository, StoreRepository storeRepository, ObjectMapper objectMapper) {
-        this.menuRepository = menuRepository;
-        this.storeRepository = storeRepository;
-        this.objectMapper = objectMapper;
-    }
+    private final FileStorageService fileStorageService;
 
     @Transactional
-    public ResponseEntity<ApiResponse<Map<String, Object>>> addMenu(MenuRequest request){
+    public ResponseEntity<ApiResponse<Map<String, Object>>> addMenu(MenuRequest request, MultipartFile imageFile){
 //        Store store = storeRepository.findById(request.getStorePK())
 //                .orElse(null);
 //
@@ -53,9 +52,17 @@ public class MenuService {
         menu.setName(request.getName());
         menu.setSection(request.getSection());
         menu.setPrice(request.getPrice());
-        menu.setImage(request.getImage());
         menu.setDescription(request.getDescription());
         menu.setAvailable(request.isAvailable());
+
+        menuRepository.save(menu);
+
+        List<String> profileImagePath = new ArrayList<>();
+        String subDirectory = "store/" +menu.getStore().getStorePK() + "/menu";
+        if (imageFile != null && !imageFile.isEmpty()) {
+            profileImagePath.add(fileStorageService.saveSingleFile(menu.getMenuPK(), subDirectory, "meun", imageFile));
+            menu.setImage(profileImagePath);
+        }
 
         menuRepository.save(menu);
 
@@ -87,18 +94,34 @@ public class MenuService {
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<Map<String, Object>>> updateMenu(Long menuId, MenuRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateMenu(Long menuId, MenuRequest request, MultipartFile imageFile) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_NOT_FOUND));
+
+        Map<String, Object> responseData = new HashMap<>();
 
         menu.setName(request.getName());
         menu.setSection(request.getSection());
         menu.setPrice(request.getPrice());
-        menu.setImage(request.getImage());
+
+        String subDirectory = "store/" +menu.getStore().getStorePK() + "/menu";
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String savedImagePath = fileStorageService.saveSingleFile(menu.getMenuPK(), subDirectory, "meun", imageFile);
+
+            List<String> currentImages = menu.getImage();
+            if (currentImages == null) {
+                currentImages = new ArrayList<>();
+            }
+            currentImages.clear();
+            currentImages.add(savedImagePath);
+
+            menu.setImage(currentImages);
+            responseData.put("image", currentImages);
+        }
+
         menu.setDescription(request.getDescription());
         menu.setAvailable(request.isAvailable());
 
-        Map<String, Object> responseData = new HashMap<>();
         responseData.put("menuId", menuId);
         responseData.put("name", menu.getName());
         responseData.put("section", menu.getSection());

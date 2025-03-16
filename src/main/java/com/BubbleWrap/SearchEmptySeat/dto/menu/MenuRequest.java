@@ -3,8 +3,8 @@ package com.BubbleWrap.SearchEmptySeat.dto.menu;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @Setter
 @Getter
@@ -17,8 +17,6 @@ public class MenuRequest {
     private String section;
 
     private int price;
-
-    private List<String> image;
 
     private String description;
 

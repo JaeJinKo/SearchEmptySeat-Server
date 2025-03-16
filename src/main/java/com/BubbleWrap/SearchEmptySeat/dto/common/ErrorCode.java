@@ -26,6 +26,7 @@ public enum ErrorCode {
     STORE_NOT_FOUND("ERROR-0201","가게 ID를 찾을 수 없습니다."),
     INVALID_CATEGORY("ERROR-0202", "유효하지 않은 카테고리입니다."),
     MENU_NOT_FOUND("ERROR-0203", "Menu not found"),
+    UNAUTHORIZED_ACCESS("ERROR-0204", "Not the owner of the store."),
     // ERROR-0300
 
 

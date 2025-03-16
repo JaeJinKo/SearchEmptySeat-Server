@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -28,4 +29,5 @@ public class SignUpRequest {
 
     @NotNull(message = "유저 타입을 입력해야 합니다.")
     private UserType userType;
+
 }

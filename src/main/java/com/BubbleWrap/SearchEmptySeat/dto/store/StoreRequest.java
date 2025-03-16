@@ -3,6 +3,7 @@ package com.BubbleWrap.SearchEmptySeat.dto.store;
 import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,5 @@ public class StoreRequest {
     private String accountNumber;
     private String depositor;
     private Map<String, String> businessHours;
-    private List<String> image;
     private List<StoreCategory> category;
 }

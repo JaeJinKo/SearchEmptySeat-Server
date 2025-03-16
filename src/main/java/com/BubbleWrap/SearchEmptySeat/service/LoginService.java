@@ -8,33 +8,29 @@ import com.BubbleWrap.SearchEmptySeat.dto.member.SignUpRequest;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.security.JwtUtil;
+import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
 import com.BubbleWrap.SearchEmptySeat.utils.RandomPassWord;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class LoginService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final MailService mailService;
-
-    public LoginService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, MailService mailService) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.mailService = mailService;
-    }
+    private final FileStorageService fileStorageService;
 
     @Transactional
-    public ResponseEntity<ApiResponse<Map<String, Object>>> registerUser(SignUpRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> registerUser(SignUpRequest request, MultipartFile imageFile) {
         Optional<Member> existingUser = memberRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.EMAIL_ALREADY_EXISTS.getCode(), ErrorCode.EMAIL_ALREADY_EXISTS.getMessage()));
@@ -52,11 +48,22 @@ public class LoginService {
 
         memberRepository.save(newUser);
 
+        List<String> profileImagePath = new ArrayList<>();
+        if (imageFile != null && !imageFile.isEmpty()) {
+            profileImagePath.add(fileStorageService.saveSingleFile(newUser.getUserId(), "member/profile", "profile", imageFile));
+        } else {
+            profileImagePath.add("member/profile/default.png"); // 기본 프로필 이미지
+        }
+        newUser.setImage(profileImagePath);
+
+        memberRepository.save(newUser);
+
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("email", newUser.getEmail());
         responseData.put("name", newUser.getName());
         responseData.put("phone", newUser.getPhone());
         responseData.put("location", newUser.getLocation());
+        responseData.put("image", newUser.getImage());
         responseData.put("userType", newUser.getUserType().name());
 
         return ResponseEntity.ok(ApiResponse.success(responseData, "Membership registration successful"));
@@ -65,7 +72,7 @@ public class LoginService {
 
 
 
-    public ResponseEntity<ApiResponse<Map<String, String>>> loginUser(LoginRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> loginUser(LoginRequest request) {
         Member user = memberRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException(ErrorCode.USER_NOT_FOUND.getMessage()));
 
@@ -75,12 +82,13 @@ public class LoginService {
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getUserType().name());
 
-        Map<String, String> responseData = new HashMap<>();
+        Map<String, Object> responseData = new HashMap<>();
         responseData.put("email", user.getEmail());
         responseData.put("userId", String.valueOf(user.getUserId()));
         responseData.put("name", user.getName());
         responseData.put("phone", user.getPhone());
         responseData.put("userType", user.getUserType().name());
+        responseData.put("image", user.getImage());
         responseData.put("token", token);
 
         return ResponseEntity.ok(ApiResponse.success(responseData, "Login Success"));

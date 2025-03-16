@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update # none, update, create
+      ddl-auto: create # none, update, create
     show-sql: true
   mail:
     host: smtp.gmail.com
@@ -23,12 +23,12 @@ spring:
             enable: true
   servlet:
     multipart:
-      max-file-size: 50MB
+      enabled: true
+      max-file-size: 10MB
       max-request-size: 50MB
 myapp:
   file:
-    upload-dir: ./uploads  # 상대경로
-    #upload-dir: /var/myapp/uploads  # 절대경로 예시
+    upload-dir: C://Temp/ses/
 jwt:
   secret: "7A85359EB855E16E6AA54AFCD271C71DC329074D922303EB41BD61E3F6BD21CD"  # JWT 서명에 사용할 비밀 키
   expiration: 3600000  # 만료 시간 (1시간 = 3600000ms)
