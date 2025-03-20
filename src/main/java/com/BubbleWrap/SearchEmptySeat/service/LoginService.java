@@ -87,6 +87,7 @@ public class LoginService {
         responseData.put("userId", String.valueOf(user.getUserId()));
         responseData.put("name", user.getName());
         responseData.put("phone", user.getPhone());
+        responseData.put("location", user.getLocation());
         responseData.put("userType", user.getUserType().name());
         responseData.put("image", user.getImage());
         responseData.put("token", token);
