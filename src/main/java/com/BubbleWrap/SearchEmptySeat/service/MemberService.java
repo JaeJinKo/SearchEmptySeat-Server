@@ -44,43 +44,49 @@ public class MemberService {
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateMyInfo(Long userId, MyInfoUpdateRequest request, MultipartFile imageFile) {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        Map<String, Object> responseData = new HashMap<>();
-
+    
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
             member.setEmail(request.getEmail());
-            responseData.put("email", member.getEmail());
         }
         if (request.getName() != null && !request.getName().isBlank()) {
             member.setName(request.getName());
-            responseData.put("name", member.getName());
         }
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             String encoded = passwordEncoder.encode(request.getPassword());
             member.setPassword(encoded);
-            responseData.put("password", "password updated");
         }
         if (request.getLocation() != null && !request.getLocation().isBlank()) {
             member.setLocation(request.getLocation());
-            responseData.put("location", member.getLocation());
         }
-
+    
         if (imageFile != null && !imageFile.isEmpty()) {
             String savedImagePath = fileStorageService.saveSingleFile(userId, "member/profile", "profile", imageFile);
-
+    
             List<String> currentImages = member.getImage();
             if (currentImages == null) {
                 currentImages = new ArrayList<>();
             }
             currentImages.clear();
             currentImages.add(savedImagePath);
-
+    
             member.setImage(currentImages);
-            responseData.put("image", currentImages);
         }
-
+    
         member.setUpdatedDate(LocalDateTime.now());
-
+    
+        // 최신 정보를 다시 읽어옴
+        Member updatedMember = memberRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("email", updatedMember.getEmail());
+        responseData.put("userId", String.valueOf(updatedMember.getUserId()));
+        responseData.put("name", updatedMember.getName());
+        responseData.put("phone", updatedMember.getPhone());
+        responseData.put("location", updatedMember.getLocation());
+        responseData.put("userType", updatedMember.getUserType().name());
+        responseData.put("image", updatedMember.getImage());
+    
         return ResponseEntity.ok(ApiResponse.success(responseData, "Update my info success"));
     }
 
