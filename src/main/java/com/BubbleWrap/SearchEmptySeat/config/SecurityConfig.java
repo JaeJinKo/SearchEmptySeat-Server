@@ -1,6 +1,5 @@
 package com.BubbleWrap.SearchEmptySeat.config;
 
-import com.BubbleWrap.SearchEmptySeat.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.BubbleWrap.SearchEmptySeat.security.JwtFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -31,7 +32,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()// 로그인, 회원가입은 모두 허용
+                        .requestMatchers("/api/auth/**", "/utils/**").permitAll()// 로그인, 회원가입은 모두 허용
                         .requestMatchers(
                                 "/api/store/register", "api/store/my",
                                 "api/menu/add", "/api/me/{userId}"
