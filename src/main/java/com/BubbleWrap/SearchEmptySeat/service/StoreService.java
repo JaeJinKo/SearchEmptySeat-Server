@@ -21,6 +21,7 @@ import com.BubbleWrap.SearchEmptySeat.model.Review;
 import com.BubbleWrap.SearchEmptySeat.model.Store;
 import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
 import com.BubbleWrap.SearchEmptySeat.model.StoreViews;
+import com.BubbleWrap.SearchEmptySeat.repository.FavoriteRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.ReviewRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
@@ -39,6 +40,7 @@ public class StoreService {
     private final MemberRepository memberRepository;
     private final StoreViewsRepository storeViewsRepository;
     private final ReviewRepository reviewRepository;
+    private final FavoriteRepository favoriteRepository;
     private final ObjectMapper objectMapper;
     private final FileStorageService fileStorageService;
 
@@ -172,8 +174,9 @@ public class StoreService {
         return ResponseEntity.ok(ApiResponse.success(response, "View My Stores"));
     }
 
-    public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores(String sortBy) {
         List<Store> stores = storeRepository.findAll();
+
         List<StoreResponse> response = stores.stream()
                 .map(store -> {
                     Double averageRating = reviewRepository.findByStoreStorePKOrderByCreatedDateDesc(store.getStorePK())
@@ -181,7 +184,18 @@ public class StoreService {
                             .mapToDouble(Review::getRating)
                             .average()
                             .orElse(0.0);
-                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating);
+                    int favoriteCount = favoriteRepository.countByStoreStorePK(store.getStorePK());
+                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount);
+                })
+                .sorted((s1, s2) -> {
+                    switch (sortBy) {
+                        case "favorite":
+                            return Integer.compare(s2.getFavoriteCount(), s1.getFavoriteCount());
+                        case "rating":
+                            return Double.compare(s2.getAverageRating(), s1.getAverageRating());
+                        default:
+                            return 0; // 기본 순서
+                    }
                 })
                 .collect(Collectors.toList());
 
@@ -210,7 +224,7 @@ public class StoreService {
         return ResponseEntity.ok(ApiResponse.success(storeResponse, "View Store By Id"));
     }
 
-    public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(String category) {
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(String category, String sortBy) {
         try {
             StoreCategory storeCategory = StoreCategory.valueOf(category.trim().toUpperCase());
 
@@ -222,7 +236,18 @@ public class StoreService {
                                 .mapToDouble(Review::getRating)
                                 .average()
                                 .orElse(0.0);
-                        return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating);
+                        int favoriteCount = favoriteRepository.countByStoreStorePK(store.getStorePK());
+                        return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount);
+                    })
+                    .sorted((s1, s2) -> {
+                        switch (sortBy) {
+                            case "favorite":
+                                return Integer.compare(s2.getFavoriteCount(), s1.getFavoriteCount());
+                            case "rating":
+                                return Double.compare(s2.getAverageRating(), s1.getAverageRating());
+                            default:
+                                return 0; // 기본 순서
+                        }
                     })
                     .collect(Collectors.toList());
 

@@ -27,6 +27,7 @@ public class StoreResponse {
     private LocalDateTime updatedDate;
     private int viewCount;
     private double averageRating;
+    private int favoriteCount;
 
     public StoreResponse(Store store) {
         this.storePK = store.getStorePK();
@@ -80,5 +81,18 @@ public class StoreResponse {
     public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount, double averageRating) {
         this(store, objectMapper, viewCount);
         this.averageRating = averageRating / 2.0;
+    }
+
+    public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount, double averageRating, int favoriteCount) {
+        this(store, objectMapper, viewCount, averageRating);
+        this.favoriteCount = favoriteCount;
+    }
+
+    public int getFavoriteCount() {
+        return favoriteCount;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
     }
 }

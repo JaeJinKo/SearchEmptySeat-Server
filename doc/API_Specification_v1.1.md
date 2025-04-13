@@ -387,6 +387,11 @@
 ### 카테고리별 가게 조회 (Get Stores By Category)
 - **URL**: `/api/store/category/{category}`
 - **HTTP Method**: GET
+- **Query Parameters**:
+  - `sortBy` (optional): 정렬 기준
+    - `favorite`: 찜 추가한 인원 많은 순
+    - `rating`: 리뷰 평점 순
+    - 기본 순서: 쿼리 파라미터를 생략하거나 다른 값을 사용
 
 #### Response
 ```json
@@ -411,7 +416,8 @@
       ],
       "category": ["KOREANFOOD", "MEAT"],
       "viewCount": 0,
-      "averageRating": 4.5
+      "averageRating": 4.5,
+      "favoriteCount": 10
     }
   ],
   "message": "View Stores By Category"

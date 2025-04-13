@@ -1,20 +1,27 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
-import com.BubbleWrap.SearchEmptySeat.dto.menu.MenuRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.store.StoreRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.store.StoreResponse;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.service.StoreService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/store")
@@ -63,8 +70,8 @@ public class StoreController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
-        return storeService.getAllStores();
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores(@RequestParam(value = "sortBy", required = false, defaultValue = "default") String sortBy) {
+        return storeService.getAllStores(sortBy);
     }
 
     @GetMapping("/{storeId}")
@@ -73,7 +80,7 @@ public class StoreController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(@PathVariable String category) {
-        return storeService.getStoresByCategory(category);
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(@PathVariable String category, @RequestParam(value = "sortBy", required = false, defaultValue = "default") String sortBy) {
+        return storeService.getStoresByCategory(category, sortBy);
     }
 }
