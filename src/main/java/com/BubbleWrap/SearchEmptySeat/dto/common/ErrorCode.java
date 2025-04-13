@@ -14,6 +14,7 @@ public enum ErrorCode {
     IMAGE_SAVE_ERROR("ERROR-0006", "이미지 저장을 실패했습니다."),
     SIZE_TO_LARGE("ERROR-0007", "파일 용량이 너무 큽니다."),
     FILE_NOT_POUND("ERROR-0008", "파일을 찾을 수 없습니다."),
+    IMAGE_UPLOAD_LIMIT_EXCEEDED("ERROR-0009", "이미지 업로드 제한을 초과했습니다."),
     // ERROR-0100 회원 관련
     USER_NOT_FOUND("ERROR-0101", "사용자를 찾을 수 없습니다."),
     INVALID_CREDENTIALS("ERROR-0102", "아이디 또는 비밀번호가 올바르지 않습니다."),

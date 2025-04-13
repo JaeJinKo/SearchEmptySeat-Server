@@ -720,8 +720,11 @@
 {
   "userPK": 1,
   "storePK": 1,
-  "image": "https://example.com/review_image.jpg",
-  "rating": 5,
+  "image": [
+    "https://example.com/review_image1.jpg",
+    "https://example.com/review_image2.jpg"
+  ],
+  "rating": 4.5,
   "content": "맛있어요!"
 }
 ```
@@ -734,8 +737,11 @@
     "reviewId": 1,
     "userPK": 1,
     "storePK": 1,
-    "image": "https://example.com/review_image.jpg",
-    "rating": 5,
+    "image": [
+      "https://example.com/review_image1.jpg",
+      "https://example.com/review_image2.jpg"
+    ],
+    "rating": 4.5,
     "content": "맛있어요!",
     "createdDate": "2023-10-01T12:00:00"
   },
@@ -756,8 +762,11 @@
       "reviewId": 1,
       "userPK": 1,
       "storePK": 1,
-      "image": "https://example.com/review_image.jpg",
-      "rating": 5,
+      "image": [
+        "https://example.com/review_image1.jpg",
+        "https://example.com/review_image2.jpg"
+      ],
+      "rating": 4.5,
       "content": "맛있어요!",
       "createdDate": "2023-10-01T12:00:00"
     }

@@ -1,12 +1,13 @@
 package com.BubbleWrap.SearchEmptySeat.dto.review;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 
-@Getter
 @Setter
+@Getter
 public class ReviewRequest {
     private Long userPK;
     private Long storePK;

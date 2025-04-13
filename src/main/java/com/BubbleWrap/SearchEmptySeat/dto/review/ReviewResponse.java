@@ -9,20 +9,18 @@ import java.util.List;
 @Getter
 public class ReviewResponse {
     private Long reviewPK;
-    private Long userPK;
-    private Long storePK;
-    private List<String> image;
-    private int rating;
+    private String userName;
+    private double rating;
     private String content;
+    private List<String> image;
     private LocalDateTime createdDate;
 
-    public ReviewResponse(Review r) {
-        this.reviewPK = r.getReviewPK();
-        this.userPK = r.getUserPK();
-        this.storePK = r.getStorePK();
-        this.image = r.getImage();
-        this.rating = r.getRating();
-        this.content = r.getContent();
-        this.createdDate = r.getCreatedDate();
+    public ReviewResponse(Review review) {
+        this.reviewPK = review.getReviewPK();
+        this.userName = review.getUser().getName();
+        this.rating = review.getRating() / 2.0;
+        this.content = review.getContent();
+        this.image = review.getImage();
+        this.createdDate = review.getCreatedDate();
     }
 }

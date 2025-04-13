@@ -1,12 +1,20 @@
 package com.BubbleWrap.SearchEmptySeat.model;
 
-import com.BubbleWrap.SearchEmptySeat.utils.JsonConverterList;
-
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.BubbleWrap.SearchEmptySeat.utils.JsonConverterList;
+
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "tbl_review")
@@ -18,13 +26,20 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewPK;
 
-    private Long userPK;   // FK -> members
-    private Long storePK;  // FK -> store
+    @ManyToOne
+    @JoinColumn(name = "userPK", nullable = false)
+    private Member user;
+
+    @ManyToOne
+    @JoinColumn(name = "storePK", nullable = false)
+    private Store store;
 
     @Convert(converter = JsonConverterList.class)
-    private List<String> image; // 예: 여러 이미지 URL
+    private List<String> image;
 
-    private int rating; // 1~5
+    private int rating;  // 0 ~ 10 저장 (0.5 단위 × 2)
+
     private String content;
-    private LocalDateTime createdDate;
+
+    private LocalDateTime createdDate = LocalDateTime.now();
 }
