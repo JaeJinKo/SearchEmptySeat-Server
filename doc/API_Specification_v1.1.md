@@ -290,7 +290,8 @@
         "https://example.com/image2.jpg"
       ],
       "category": ["KOREANFOOD", "MEAT"],
-      "viewCount": 0
+      "viewCount": 0,
+      "averageRating": 4.5
     }
   ],
   "message": "View My Stores"
@@ -323,7 +324,8 @@
         "https://example.com/image2.jpg"
       ],
       "category": ["KOREANFOOD", "MEAT"],
-      "viewCount": 0
+      "viewCount": 0,
+      "averageRating": 4.5
     },
     {
       "storeName": "다른 가게",
@@ -342,7 +344,8 @@
         "https://example.com/other_image2.jpg"
       ],
       "category": ["RESTAURANT"],
-      "viewCount": 5
+      "viewCount": 5,
+      "averageRating": 3.8
     }
   ],
   "message": "View All Stores"
@@ -374,7 +377,8 @@
       "https://example.com/image2.jpg"
     ],
     "category": ["KOREANFOOD", "MEAT"],
-    "viewCount": 10
+    "viewCount": 10,
+    "averageRating": 4.5
   },
   "message": "View Store By Id"
 }
@@ -406,7 +410,8 @@
         "https://example.com/image2.jpg"
       ],
       "category": ["KOREANFOOD", "MEAT"],
-      "viewCount": 0
+      "viewCount": 0,
+      "averageRating": 4.5
     }
   ],
   "message": "View Stores By Category"

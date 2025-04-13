@@ -1,31 +1,35 @@
 package com.BubbleWrap.SearchEmptySeat.service;
 
-import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
-import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
-import com.BubbleWrap.SearchEmptySeat.dto.store.StoreRequest;
-import com.BubbleWrap.SearchEmptySeat.dto.store.StoreResponse;
-import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
-import com.BubbleWrap.SearchEmptySeat.model.Member;
-import com.BubbleWrap.SearchEmptySeat.model.Store;
-import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
-import com.BubbleWrap.SearchEmptySeat.model.StoreViews;
-import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
-import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
-import com.BubbleWrap.SearchEmptySeat.repository.StoreViewsRepository;
-import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
+import com.BubbleWrap.SearchEmptySeat.dto.store.StoreRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.store.StoreResponse;
+import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
+import com.BubbleWrap.SearchEmptySeat.model.Member;
+import com.BubbleWrap.SearchEmptySeat.model.Review;
+import com.BubbleWrap.SearchEmptySeat.model.Store;
+import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
+import com.BubbleWrap.SearchEmptySeat.model.StoreViews;
+import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.ReviewRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.StoreViewsRepository;
+import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
     private final StoreViewsRepository storeViewsRepository;
+    private final ReviewRepository reviewRepository;
     private final ObjectMapper objectMapper;
     private final FileStorageService fileStorageService;
 
@@ -154,7 +159,14 @@ public class StoreService {
         List<Store> stores = storeRepository.findByOwnerUserId(owner.getUserId());
 
         List<StoreResponse> response = stores.stream()
-                .map(store -> new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK())))
+                .map(store -> {
+                    Double averageRating = reviewRepository.findByStoreStorePKOrderByCreatedDateDesc(store.getStorePK())
+                            .stream()
+                            .mapToDouble(Review::getRating)
+                            .average()
+                            .orElse(0.0);
+                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating);
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(ApiResponse.success(response, "View My Stores"));
@@ -163,7 +175,14 @@ public class StoreService {
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
         List<Store> stores = storeRepository.findAll();
         List<StoreResponse> response = stores.stream()
-                .map(store -> new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK())))
+                .map(store -> {
+                    Double averageRating = reviewRepository.findByStoreStorePKOrderByCreatedDateDesc(store.getStorePK())
+                            .stream()
+                            .mapToDouble(Review::getRating)
+                            .average()
+                            .orElse(0.0);
+                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating);
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(ApiResponse.success(response, "View All Stores"));
@@ -176,10 +195,17 @@ public class StoreService {
         StoreViews storeViews = storeViewsRepository.findByStoreStorePK(storeId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorCode.STORE_VIEWS_NOT_FOUND.getMessage()));
 
+        // Calculate average rating
+        Double averageRating = reviewRepository.findByStoreStorePKOrderByCreatedDateDesc(storeId)
+                .stream()
+                .mapToDouble(Review::getRating)
+                .average()
+                .orElse(0.0);
+
+        StoreResponse storeResponse = new StoreResponse(store, objectMapper, storeViews.getViewCount(), averageRating);
+
         storeViews.increaseViewCount();
         storeViewsRepository.save(storeViews);
-
-        StoreResponse storeResponse = new StoreResponse(store, objectMapper, storeViews.getViewCount());
 
         return ResponseEntity.ok(ApiResponse.success(storeResponse, "View Store By Id"));
     }
@@ -190,7 +216,14 @@ public class StoreService {
 
             List<Store> stores = storeRepository.findByCategory(storeCategory);
             List<StoreResponse> response = stores.stream()
-                    .map(store -> new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK())))
+                    .map(store -> {
+                        Double averageRating = reviewRepository.findByStoreStorePKOrderByCreatedDateDesc(store.getStorePK())
+                                .stream()
+                                .mapToDouble(Review::getRating)
+                                .average()
+                                .orElse(0.0);
+                        return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating);
+                    })
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(ApiResponse.success(response, "View Stores By Category"));

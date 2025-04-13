@@ -1,13 +1,14 @@
 package com.BubbleWrap.SearchEmptySeat.dto.store;
 
-import com.BubbleWrap.SearchEmptySeat.model.Store;
-import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import com.BubbleWrap.SearchEmptySeat.model.Store;
+import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Getter;
 
 @Getter
 public class StoreResponse {
@@ -25,6 +26,7 @@ public class StoreResponse {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
     private int viewCount;
+    private double averageRating;
 
     public StoreResponse(Store store) {
         this.storePK = store.getStorePK();
@@ -73,5 +75,10 @@ public class StoreResponse {
         this.createdDate = store.getCreatedDate();
         this.updatedDate = store.getUpdatedDate();
         this.viewCount = viewCount;
+    }
+
+    public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount, double averageRating) {
+        this(store, objectMapper, viewCount);
+        this.averageRating = averageRating / 2.0;
     }
 }

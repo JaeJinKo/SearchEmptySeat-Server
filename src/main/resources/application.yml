@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create # none, update, create
+      ddl-auto: update # none, update, create
     show-sql: true
   mail:
     host: smtp.gmail.com
