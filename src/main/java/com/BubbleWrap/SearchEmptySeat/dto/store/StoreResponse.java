@@ -28,6 +28,7 @@ public class StoreResponse {
     private int viewCount;
     private double averageRating;
     private int favoriteCount;
+    private int reservationCount;
 
     public StoreResponse(Store store) {
         this.storePK = store.getStorePK();
@@ -75,7 +76,6 @@ public class StoreResponse {
         this.category = store.getCategory();
         this.createdDate = store.getCreatedDate();
         this.updatedDate = store.getUpdatedDate();
-        this.viewCount = viewCount;
     }
 
     public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount, double averageRating) {
@@ -88,11 +88,20 @@ public class StoreResponse {
         this.favoriteCount = favoriteCount;
     }
 
+    public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount, double averageRating, int favoriteCount, long reservationCount) {
+        this(store, objectMapper, viewCount, averageRating, favoriteCount);
+        this.reservationCount = (int) reservationCount;
+    }
+
     public int getFavoriteCount() {
         return favoriteCount;
     }
 
     public double getAverageRating() {
         return averageRating;
+    }
+
+    public int getReservationCount() {
+        return reservationCount;
     }
 }

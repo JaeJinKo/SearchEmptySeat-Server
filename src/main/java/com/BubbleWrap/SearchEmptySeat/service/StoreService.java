@@ -26,6 +26,7 @@ import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.ReviewRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreViewsRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.ReservationRepository;
 import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,6 +42,7 @@ public class StoreService {
     private final StoreViewsRepository storeViewsRepository;
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
+    private final ReservationRepository reservationRepository;
     private final ObjectMapper objectMapper;
     private final FileStorageService fileStorageService;
 
@@ -56,7 +58,7 @@ public class StoreService {
         String email = authentication.getName();
 
         Member owner = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorCode.USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Store store = new Store();
         store.setOwner(owner);
@@ -185,7 +187,8 @@ public class StoreService {
                             .average()
                             .orElse(0.0);
                     int favoriteCount = favoriteRepository.countByStoreStorePK(store.getStorePK());
-                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount);
+                    long reservationCount = reservationRepository.countByStorePK(store.getStorePK());
+                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount, reservationCount);
                 })
                 .sorted((s1, s2) -> {
                     switch (sortBy) {
@@ -193,6 +196,8 @@ public class StoreService {
                             return Integer.compare(s2.getFavoriteCount(), s1.getFavoriteCount());
                         case "rating":
                             return Double.compare(s2.getAverageRating(), s1.getAverageRating());
+                        case "reservation":
+                            return Integer.compare(s2.getReservationCount(), s1.getReservationCount());
                         default:
                             return 0; // 기본 순서
                     }
@@ -237,7 +242,8 @@ public class StoreService {
                                 .average()
                                 .orElse(0.0);
                         int favoriteCount = favoriteRepository.countByStoreStorePK(store.getStorePK());
-                        return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount);
+                        long reservationCount = reservationRepository.countByStorePK(store.getStorePK());
+                        return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount, reservationCount);
                     })
                     .sorted((s1, s2) -> {
                         switch (sortBy) {
@@ -245,6 +251,8 @@ public class StoreService {
                                 return Integer.compare(s2.getFavoriteCount(), s1.getFavoriteCount());
                             case "rating":
                                 return Double.compare(s2.getAverageRating(), s1.getAverageRating());
+                            case "reservation":
+                                return Integer.compare(s2.getReservationCount(), s1.getReservationCount());
                             default:
                                 return 0; // 기본 순서
                         }
