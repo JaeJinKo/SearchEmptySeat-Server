@@ -887,4 +887,107 @@
   ],
   "message": "Favorite list retrieved successfully"
 }
-``` 
+```
+
+## Reservation API
+
+### Create Reservation
+- **URL**: `/api/reservations/create`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "userId": "Long",
+    "storePK": "Long",
+    "reservationNum": "int",
+    "reservationTime": "LocalDateTime",
+    "menu": "Map<String, Object>",
+    "seats": "String",
+    "partySize": "int",
+    "paymentMethod": "String",
+    "status": "String"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "reservationId": "Long",
+      "message": "Reservation created"
+    }
+  }
+  ```
+
+### Cancel Reservation
+- **URL**: `/api/reservations/cancel/{reservationId}`
+- **Method**: `DELETE`
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "message": "Reservation cancelled successfully"
+  }
+  ```
+
+### Get Owner Reservations
+- **URL**: `/api/reservations/owner/{storeId}`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "reservationId": "Long",
+        "userName": "String",
+        "partySize": "int",
+        "seats": "String",
+        "reservationNum": "int",
+        "menu": "Map<String, Object>"
+      }
+    ]
+  }
+  ```
+
+### Get User Reservations
+- **URL**: `/api/reservations/user/{userId}`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "data": [
+      {
+        "storeName": "String",
+        "location": "String",
+        "reservationTime": "LocalDateTime",
+        "partySize": "int",
+        "menu": "Map<String, Object>",
+        "seats": "String"
+      }
+    ]
+  }
+  ```
+
+### Get Reservation Details
+- **URL**: `/api/reservations/details/{reservationId}`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "storeName": "String",
+      "storeId": "Long",
+      "location": "String",
+      "reservationTime": "LocalDateTime",
+      "seats": "String",
+      "partySize": "int",
+      "menu": {
+        "itemName": "String",
+        "price": "double"
+      }
+    }
+  }
+  ``` 

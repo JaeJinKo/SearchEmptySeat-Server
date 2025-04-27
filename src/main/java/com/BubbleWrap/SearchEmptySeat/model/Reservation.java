@@ -23,7 +23,10 @@ public class Reservation {
     private LocalDateTime reservationTime;
 
     @Convert(converter = JsonConverterMap.class)
-    private Map<String, Object> menu; // JSON (선택 메뉴 내역 등)
+    private Map<String, Object> menu; // JSON (선택 메뉴)
+
+    @Convert(converter = JsonConverterMap.class)
+    private Map<String, Object> placement; // JSON (좌석 정보)
 
     private String seats;
     private int partySize;
@@ -31,4 +34,8 @@ public class Reservation {
     private String status;         // "pending", "confirmed", "cancelled"
     private LocalDateTime createdDate;
     private LocalDateTime endDate;
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
 }

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reservation")
-class ReservationController {
+@RequestMapping("/api/reservations")
+public class ReservationController {
 
     private final ReservationService reservationService;
 
@@ -19,13 +19,28 @@ class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ReservationResponse>> create(@RequestBody ReservationRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<ReservationResponse>> createReservation(@RequestBody ReservationRequest request) {
         return reservationService.createReservation(request);
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ReservationResponse>>> getAll() {
-        return reservationService.getAllReservations();
+    @DeleteMapping("/cancel/{reservationId}")
+    public ResponseEntity<ApiResponse<String>> cancelReservation(@PathVariable Long reservationId) {
+        return reservationService.cancelReservation(reservationId);
+    }
+
+    @GetMapping("/owner/{storeId}")
+    public ResponseEntity<ApiResponse<List<ReservationResponse>>> getOwnerReservations(@PathVariable Long storeId) {
+        return reservationService.getOwnerReservations(storeId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<List<ReservationResponse>>> getUserReservations(@PathVariable Long userId) {
+        return reservationService.getUserReservations(userId);
+    }
+
+    @GetMapping("/details/{reservationId}")
+    public ResponseEntity<ApiResponse<ReservationResponse>> getReservationDetails(@PathVariable Long reservationId) {
+        return reservationService.getReservationDetails(reservationId);
     }
 }
