@@ -449,6 +449,7 @@
 
 #### Request Parameters
 - **storeName**: 검색할 가게명 (String, 필수)
+- 한글 검색 시 URL 인코딩 필요
 
 #### Response
 ```json
