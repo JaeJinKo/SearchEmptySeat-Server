@@ -443,6 +443,42 @@
 }
 ```
 
+### 가게명 검색 (Search Stores by Name)
+- **URL**: `/api/store/search`
+- **HTTP Method**: GET
+
+#### Request Parameters
+- **storeName**: 검색할 가게명 (String, 필수)
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "storeName": "맛있는 한식당",
+      "location": "서울시 강남구",
+      "description": "한식 전문점입니다.",
+      "businessRegistrationNumber": "123-45-67890",
+      "bank": "국민은행",
+      "accountNumber": "123456-78-901234",
+      "depositor": "김사장",
+      "category": ["KOREANFOOD", "MEAT"],
+      "businessHours": {
+        "월요일": "09:00 - 22:00",
+        "화요일": "09:00 - 22:00"
+      },
+      "image": ["store/image1.png", "store/image2.png"],
+      "viewCount": 100,
+      "averageRating": 4.5,
+      "favoriteCount": 20,
+      "reservationCount": 15
+    }
+  ],
+  "message": "Search Stores By Name"
+}
+```
+
 ## 메뉴 (Menu)
 
 ### 메뉴 추가 (Add Menu)

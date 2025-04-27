@@ -264,4 +264,23 @@ public class StoreService {
             return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_CATEGORY.getCode(), ErrorCode.INVALID_CATEGORY.getMessage()));
         }
     }
+
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> searchStoresByName(String storeName) {
+        List<Store> stores = storeRepository.findByStoreNameContaining(storeName);
+
+        List<StoreResponse> response = stores.stream()
+                .map(store -> {
+                    Double averageRating = reviewRepository.findByStoreStorePKOrderByCreatedDateDesc(store.getStorePK())
+                            .stream()
+                            .mapToDouble(Review::getRating)
+                            .average()
+                            .orElse(0.0);
+                    int favoriteCount = favoriteRepository.countByStoreStorePK(store.getStorePK());
+                    long reservationCount = reservationRepository.countByStorePK(store.getStorePK());
+                    return new StoreResponse(store, objectMapper, getStoreViews(store.getStorePK()), averageRating, favoriteCount, reservationCount);
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(ApiResponse.success(response, "Search Stores By Name"));
+    }
 }

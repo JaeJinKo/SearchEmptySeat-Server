@@ -83,4 +83,9 @@ public class StoreController {
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(@PathVariable String category, @RequestParam(value = "sortBy", required = false, defaultValue = "default") String sortBy) {
         return storeService.getStoresByCategory(category, sortBy);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> searchStoresByName(@RequestParam String storeName) {
+        return storeService.searchStoresByName(storeName);
+    }
 }
