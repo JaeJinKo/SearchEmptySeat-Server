@@ -402,7 +402,7 @@
 ```
 
 ### 카테고리별 가게 조회 (Get Stores By Category)
-- **URL**: `/api/store/category/{category}`
+- **URL**: `/api/store/all/category/{category}`
 - **HTTP Method**: GET
 - **Query Parameters**:
   - `sortBy` (optional): 정렬 기준
@@ -444,7 +444,7 @@
 ```
 
 ### 가게명 검색 (Search Stores by Name)
-- **URL**: `/api/store/search`
+- **URL**: `/api/store/search?storeName=%E%3`
 - **HTTP Method**: GET
 
 #### Request Parameters

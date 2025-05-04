@@ -79,7 +79,7 @@ public class StoreController {
         return storeService.getStoreById(storeId);
     }
 
-    @GetMapping("/category/{category}")
+    @GetMapping("/all/category/{category}")
     public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(@PathVariable String category, @RequestParam(value = "sortBy", required = false, defaultValue = "default") String sortBy) {
         return storeService.getStoresByCategory(category, sortBy);
     }
