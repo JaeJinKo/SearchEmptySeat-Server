@@ -26,4 +26,12 @@ public class Favorite {
     private Store store;
 
     private LocalDateTime favoriteDate;
+
+    public Long getFavoritePK() {
+        return favoritePK;
+    }
+
+    public Store getStore() {
+        return store;
+    }
 }

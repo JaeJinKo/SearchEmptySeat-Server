@@ -3,6 +3,7 @@ package com.BubbleWrap.SearchEmptySeat.service;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.favorite.FavoriteResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.store.StoreResponse;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Favorite;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
@@ -94,7 +95,11 @@ public class FavoriteService {
         List<Favorite> favorites = favoriteRepository.findByUser(user);
 
         List<FavoriteResponse> response = favorites.stream()
-                .map(FavoriteResponse::new) // ✅ StoreResponse 포함한 FavoriteResponse 생성
+                .map(favorite -> {
+                    Store store = favorite.getStore();
+                    StoreResponse storeResponse = new StoreResponse(store);
+                    return new FavoriteResponse(favorite, storeResponse);
+                })
                 .toList();
 
         return ResponseEntity.ok(ApiResponse.success(response, "Favorite list retrieved successfully"));
