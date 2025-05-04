@@ -41,6 +41,8 @@ CREATE TABLE tbl_store (
     image JSON,
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
     FOREIGN KEY (userId) REFERENCES tbl_members(userId)
 );
 CREATE TABLE tbl_storeViews (

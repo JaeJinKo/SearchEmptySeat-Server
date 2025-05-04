@@ -395,7 +395,9 @@
     "viewCount": 10,
     "averageRating": 4.5,
     "favoriteCount": 0,
-    "reservationCount": 0
+    "reservationCount": 0,
+    "latitude": 37.5665,
+    "longitude": 126.9780
   },
   "message": "View Store By Id"
 }
@@ -909,7 +911,30 @@
   "status": "success",
   "data": {
     "favoriteId": 1,
-    "storeId": 1
+    "store": {
+      "storeName": "맛있는 한식당",
+      "location": "서울시 강남구",
+      "description": "한식 전문점입니다.",
+      "businessRegistrationNumber": "123-45-67890",
+      "bank": "국민은행",
+      "accountNumber": "123456-78-901234",
+      "depositor": "김사장",
+      "businessHours": {
+        "월요일": "09:00 - 22:00",
+        "화요일": "09:00 - 22:00"
+      },
+      "image": [
+        "https://example.com/image1.jpg",
+        "https://example.com/image2.jpg"
+      ],
+      "category": ["KOREANFOOD", "MEAT"],
+      "viewCount": 10,
+      "averageRating": 4.5,
+      "favoriteCount": 0,
+      "reservationCount": 0,
+      "latitude": 37.5665,
+      "longitude": 126.9780
+    }
   },
   "message": "Favorite added successfully"
 }
@@ -938,112 +963,32 @@
   "data": [
     {
       "favoriteId": 1,
-      "storeId": 1
+      "store": {
+        "storeName": "맛있는 한식당",
+        "location": "서울시 강남구",
+        "description": "한식 전문점입니다.",
+        "businessRegistrationNumber": "123-45-67890",
+        "bank": "국민은행",
+        "accountNumber": "123456-78-901234",
+        "depositor": "김사장",
+        "businessHours": {
+          "월요일": "09:00 - 22:00",
+          "화요일": "09:00 - 22:00"
+        },
+        "image": [
+          "https://example.com/image1.jpg",
+          "https://example.com/image2.jpg"
+        ],
+        "category": ["KOREANFOOD", "MEAT"],
+        "viewCount": 10,
+        "averageRating": 4.5,
+        "favoriteCount": 0,
+        "reservationCount": 0,
+        "latitude": 37.5665,
+        "longitude": 126.9780
+      }
     }
   ],
   "message": "Favorite list retrieved successfully"
 }
 ```
-
-## Reservation API
-
-### Create Reservation
-- **URL**: `/api/reservations/create`
-- **Method**: `POST`
-- **Request Body**:
-  ```json
-  {
-    "userId": "Long",
-    "storePK": "Long",
-    "reservationNum": "int",
-    "reservationTime": "LocalDateTime",
-    "menu": "Map<String, Object>",
-    "seats": "String",
-    "partySize": "int",
-    "paymentMethod": "String",
-    "status": "String"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "reservationId": "Long",
-      "message": "Reservation created"
-    }
-  }
-  ```
-
-### Cancel Reservation
-- **URL**: `/api/reservations/cancel/{reservationId}`
-- **Method**: `DELETE`
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "message": "Reservation cancelled successfully"
-  }
-  ```
-
-### Get Owner Reservations
-- **URL**: `/api/reservations/owner/{storeId}`
-- **Method**: `GET`
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "data": [
-      {
-        "reservationId": "Long",
-        "userName": "String",
-        "partySize": "int",
-        "seats": "String",
-        "reservationNum": "int",
-        "menu": "Map<String, Object>"
-      }
-    ]
-  }
-  ```
-
-### Get User Reservations
-- **URL**: `/api/reservations/user/{userId}`
-- **Method**: `GET`
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "data": [
-      {
-        "storeName": "String",
-        "location": "String",
-        "reservationTime": "LocalDateTime",
-        "partySize": "int",
-        "menu": "Map<String, Object>",
-        "seats": "String"
-      }
-    ]
-  }
-  ```
-
-### Get Reservation Details
-- **URL**: `/api/reservations/details/{reservationId}`
-- **Method**: `GET`
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "storeName": "String",
-      "storeId": "Long",
-      "location": "String",
-      "reservationTime": "LocalDateTime",
-      "seats": "String",
-      "partySize": "int",
-      "menu": {
-        "itemName": "String",
-        "price": "double"
-      }
-    }
-  }
-  ``` 

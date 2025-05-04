@@ -59,7 +59,8 @@ public class FavoriteService {
         favorite.setStore(store);
         favoriteRepository.save(favorite);
 
-        return ResponseEntity.ok(ApiResponse.success(new FavoriteResponse(favorite), "Added to favorites"));
+        StoreResponse storeResponse = new StoreResponse(store);
+        return ResponseEntity.ok(ApiResponse.success(new FavoriteResponse(favorite, storeResponse), "Added to favorites"));
     }
 
     /**

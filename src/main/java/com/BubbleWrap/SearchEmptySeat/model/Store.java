@@ -57,4 +57,7 @@ public class Store {
     private LocalDateTime createdDate = LocalDateTime.now();
 
     private LocalDateTime updatedDate = LocalDateTime.now();
+
+    private Double latitude;
+    private Double longitude;
 }
