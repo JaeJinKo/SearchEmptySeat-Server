@@ -60,4 +60,52 @@ public class Store {
 
     private Double latitude;
     private Double longitude;
+
+    public Long getStorePK() {
+        return storePK;
+    }
+
+    public Member getOwner() {
+        return owner;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getBusinessRegistrationNumber() {
+        return businessRegistrationNumber;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getDepositor() {
+        return depositor;
+    }
+
+    public Map<String, String> getBusinessHours() {
+        return businessHours;
+    }
+
+    public List<String> getImage() {
+        return image;
+    }
+
+    public List<StoreCategory> getCategory() {
+        return category;
+    }
 }

@@ -1,5 +1,6 @@
 package com.BubbleWrap.SearchEmptySeat.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import com.BubbleWrap.SearchEmptySeat.model.Review;
 import com.BubbleWrap.SearchEmptySeat.model.Store;
 import com.BubbleWrap.SearchEmptySeat.model.StoreCategory;
 import com.BubbleWrap.SearchEmptySeat.model.StoreViews;
+import com.BubbleWrap.SearchEmptySeat.model.Reservation;
 import com.BubbleWrap.SearchEmptySeat.repository.FavoriteRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.ReviewRepository;
@@ -32,6 +34,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
+import java.util.Locale;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -282,5 +289,45 @@ public class StoreService {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(ApiResponse.success(response, "Search Stores By Name"));
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Map<String, Object> getReservationStats(Long storeId) {
+        Map<String, Object> data = new HashMap<>();
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEnd = todayStart.plusDays(1);
+
+        // 요일별 예약 건수 계산
+        List<Map<String, Object>> weeklyStats = new ArrayList<>();
+        String[] days = {"월", "화", "수", "목", "금", "토", "일"};
+        Map<String, Integer> dayCounts = new HashMap<>();
+        for (String day : days) {
+            dayCounts.put(day, 0);
+        }
+
+        // 주간 예약을 가져오기 위해 시작일과 종료일 설정
+        LocalDateTime weekStart = todayStart.minusDays(todayStart.getDayOfWeek().getValue() - 1);
+        LocalDateTime weekEnd = weekStart.plusDays(7);
+
+        List<Reservation> reservations = reservationRepository.findByStorePKAndReservationTimeBetween(storeId, weekStart, weekEnd);
+        for (Reservation reservation : reservations) {
+            String dayOfWeek = reservation.getReservationTime().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
+            dayCounts.put(dayOfWeek, dayCounts.get(dayOfWeek) + 1);
+        }
+
+        for (String day : days) {
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("day", day);
+            stats.put("averageTeams", dayCounts.get(day));
+            weeklyStats.add(stats);
+        }
+
+        // 오늘 예약 수로 설정
+        long currentReservations = reservationRepository.countByStorePKAndReservationTimeBetween(storeId, todayStart, todayEnd);
+        data.put("currentReservations", (int) currentReservations);
+
+        data.put("estimatedWaitTime", 1);
+        data.put("weeklyStats", weeklyStats);
+        return data;
     }
 }

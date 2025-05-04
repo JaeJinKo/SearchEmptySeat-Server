@@ -482,6 +482,33 @@
 }
 ```
 
+### 가게 예약 통계 조회 (Get Store Reservation Statistics)
+- **URL**: `/api/store/{storeId}/reservations/stats`
+- **HTTP Method**: GET
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "currentReservations": 0,
+    "estimatedWaitTime": 1,
+    "weeklyStats": [
+      {
+        "day": "월",
+        "averageTeams": 0
+      },
+      {
+        "day": "화",
+        "averageTeams": 0
+      }
+      // ... 다른 요일 데이터
+    ]
+  },
+  "message": "Reservation statistics retrieved successfully"
+}
+```
+
 ## 메뉴 (Menu)
 
 ### 메뉴 추가 (Add Menu)

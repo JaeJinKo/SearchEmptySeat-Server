@@ -41,4 +41,8 @@ public class StoreViews {
         this.viewCount++;
         this.updatedDate = LocalDateTime.now();
     }
+
+    public int getViewCount() {
+        return viewCount;
+    }
 }

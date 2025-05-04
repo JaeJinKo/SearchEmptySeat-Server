@@ -2,6 +2,8 @@ package com.BubbleWrap.SearchEmptySeat.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,5 +89,11 @@ public class StoreController {
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<StoreResponse>>> searchStoresByName(@RequestParam String storeName) {
         return storeService.searchStoresByName(storeName);
+    }
+
+    @GetMapping("/{storeId}/reservations/stats")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getReservationStats(@PathVariable Long storeId) {
+        Map<String, Object> data = storeService.getReservationStats(storeId);
+        return ResponseEntity.ok(ApiResponse.success(data, "Reservation statistics retrieved successfully"));
     }
 }

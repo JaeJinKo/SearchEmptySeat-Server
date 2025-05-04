@@ -42,4 +42,8 @@ public class Review {
     private String content;
 
     private LocalDateTime createdDate = LocalDateTime.now();
+
+    public int getRating() {
+        return rating;
+    }
 }
