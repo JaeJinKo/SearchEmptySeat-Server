@@ -14,4 +14,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     long countByStorePKAndReservationTimeAfter(Long storePK, LocalDateTime time);
     long countByStorePKAndReservationTimeBetween(Long storePK, LocalDateTime start, LocalDateTime end);
     List<Reservation> findByReservationTimeBetweenAndStatus(LocalDateTime start, LocalDateTime end, String status);
+    List<Reservation> findByStorePKAndStatus(Long storePK, String status);
 }

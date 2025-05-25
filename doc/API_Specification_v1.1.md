@@ -1265,3 +1265,28 @@
   "message": "Favorite list retrieved successfully"
 }
 ```
+
+## 통계 (Statistics)
+
+### 메뉴 판매율 통계 (Menu Sales Statistics)
+- **URL**: `/api/web/statistics/menu-sales/{storeId}`
+- **HTTP Method**: GET
+- **설명**: 가게의 확정된 예약에서 판매된 메뉴들의 판매율을 퍼센트로 계산하여 반환합니다.
+
+#### Response
+```json
+{
+    "status": "success",
+    "data": {
+        "아이스 아메리카노": "20",
+        "카페라떼": "50",
+        "카페모카": "30"
+    },
+    "message": "메뉴 판매율 통계를 조회했습니다."
+}
+```
+
+#### 주의사항
+1. 통계는 'confirmed' 상태의 예약만을 대상으로 계산됩니다.
+2. 각 메뉴의 판매율은 소수점을 버리고 정수로 반환됩니다.
+3. 판매된 메뉴가 없는 경우 빈 객체를 반환합니다.
