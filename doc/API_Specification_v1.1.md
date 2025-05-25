@@ -870,54 +870,186 @@
 ## 예약 (Reservation)
 
 ### 예약 생성 (Create Reservation)
-- **URL**: `/api/reservation`
+- **URL**: `/api/reservations/create`
 - **HTTP Method**: POST
 
 #### Request Body
 ```json
 {
-  "date": "2023-10-01",
-  "time": "18:00",
-  "storeId": 1,
-  "tableNumber": 5
+    "userId": 1,
+    "storePK": 1,
+    "reservationNum": 1,
+    "reservationTime": "2024-03-25T18:00:00",
+    "menu": {
+        "1": {
+            "name": "아메리카노",
+            "price": 4000,
+            "quantity": 2
+        },
+        "2": {
+            "name": "카페라떼",
+            "price": 4500,
+            "quantity": 1
+        }
+    },
+    "tableNumber": 5,
+    "partySize": 3,
+    "paymentMethod": "offline",  // "point","offline"
+    "status": "pending"      // "pending", "confirmed", "cancelled"
 }
 ```
 
 #### Response
 ```json
 {
-  "status": "success",
-  "data": {
-    "reservationId": 1,
-    "date": "2023-10-01",
-    "time": "18:00",
-    "storeId": 1,
-    "tableNumber": 5
-  },
-  "message": "Reservation created successfully"
+    "status": "success",
+    "data": {
+        "reservationPK": 1,
+        "userId": 1,
+        "storePK": 1,
+        "reservationNum": 1,
+        "reservationTime": "2024-03-25T18:00:00",
+        "menu": {
+            "1": {
+                "name": "아메리카노",
+                "price": 4000,
+                "quantity": 2
+            },
+            "2": {
+                "name": "카페라떼",
+                "price": 4500,
+                "quantity": 1
+            }
+        },
+        "tableNumber": 5,
+        "partySize": 3,
+        "paymentMethod": "point",
+        "status": "confirmed",
+        "createdDate": "2024-03-25T17:00:00",
+        "endDate": "2024-03-25T19:00:00"
+    },
+    "message": "Reservation created"
 }
 ```
 
-### 모든 예약 조회 (Get All Reservations)
-- **URL**: `/api/reservation`
+### 예약 취소 (Cancel Reservation)
+- **URL**: `/api/reservations/cancel/{reservationId}`
+- **HTTP Method**: DELETE
+
+#### Response
+```json
+{
+    "status": "success",
+    "message": "Reservation cancelled successfully"
+}
+```
+
+### 가게별 예약 목록 조회 (Get Owner Reservations)
+- **URL**: `/api/reservations/owner/{storeId}`
 - **HTTP Method**: GET
 
 #### Response
 ```json
 {
-  "status": "success",
-  "data": [
-    {
-      "reservationId": 1,
-      "date": "2023-10-01",
-      "time": "18:00",
-      "storeId": 1,
-      "tableNumber": 5
-    }
-  ],
-  "message": "All reservations"
+    "status": "success",
+    "data": [
+        {
+            "reservationPK": 1,
+            "userId": 1,
+            "storePK": 1,
+            "reservationNum": 1,
+            "reservationTime": "2024-03-25T18:00:00",
+            "menu": {
+                "1": {
+                    "name": "아메리카노",
+                    "price": 4000,
+                    "quantity": 2
+                }
+            },
+            "tableNumber": 5,
+            "partySize": 3,
+            "paymentMethod": "point",
+            "status": "confirmed",
+            "createdDate": "2024-03-25T17:00:00",
+            "endDate": "2024-03-25T19:00:00"
+        }
+    ],
+    "message": "Owner reservations retrieved successfully"
 }
 ```
+
+### 사용자별 예약 목록 조회 (Get User Reservations)
+- **URL**: `/api/reservations/user/{userId}`
+- **HTTP Method**: GET
+
+#### Response
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "reservationPK": 1,
+            "userId": 1,
+            "storePK": 1,
+            "reservationNum": 1,
+            "reservationTime": "2024-03-25T18:00:00",
+            "menu": {
+                "1": {
+                    "name": "아메리카노",
+                    "price": 4000,
+                    "quantity": 2
+                }
+            },
+            "tableNumber": 5,
+            "partySize": 3,
+            "paymentMethod": "point",
+            "status": "confirmed",
+            "createdDate": "2024-03-25T17:00:00",
+            "endDate": "2024-03-25T19:00:00"
+        }
+    ],
+    "message": "User reservations retrieved successfully"
+}
+```
+
+### 예약 상세 정보 조회 (Get Reservation Details)
+- **URL**: `/api/reservations/details/{reservationId}`
+- **HTTP Method**: GET
+
+#### Response
+```json
+{
+    "status": "success",
+    "data": {
+        "reservationPK": 1,
+        "userId": 1,
+        "storePK": 1,
+        "reservationNum": 1,
+        "reservationTime": "2024-03-25T18:00:00",
+        "menu": {
+            "1": {
+                "name": "아메리카노",
+                "price": 4000,
+                "quantity": 2
+            }
+        },
+        "tableNumber": 5,
+        "partySize": 3,
+        "paymentMethod": "point",
+        "status": "confirmed",
+        "createdDate": "2024-03-25T17:00:00",
+        "endDate": "2024-03-25T19:00:00"
+    },
+    "message": "Reservation details retrieved successfully"
+}
+```
+
+#### 주의사항
+1. 예약 취소는 예약 시간 30분 전까지만 가능합니다.
+2. 예약 상태는 "pending"(대기), "confirmed"(확정), "cancelled"(취소) 중 하나여야 합니다.
+3. 결제 방법은 "point"(포인트) 또는 "offline"(현장결제) 중 하나여야 합니다.
+4. 예약 시간은 현재 시간 이후여야 합니다.
+5. 예약 인원은 해당 테이블의 최대 인원을 초과할 수 없습니다.
 
 ## 리뷰 (Review)
 
