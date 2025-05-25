@@ -703,55 +703,169 @@
 }
 ```
 
-## 배치 (Placement)
+## 자리 배치 (Placement)
 
-### 배치 생성 (Create Placement)
+### 자리 배치 등록 (Create Placement)
 - **URL**: `/api/placement`
 - **HTTP Method**: POST
 
 #### Request Body
 ```json
 {
-  "storePK": 1,
-  "layout": "배치 레이아웃"
+    "storePK": 1,
+    "layout": {
+        "1": {
+            "x": 10,
+            "y": 10,
+            "table": 4,    // 최대 인원
+            "min": 2,      // 최소 인원
+            "status": 0    // 0=빈자리, 1=예약, 2=사용중
+        },
+        "2": {
+            "x": 20,
+            "y": 20,
+            "table": 2,
+            "min": 1,
+            "status": 0
+        }
+    },
+    "layoutSize": 1       // 1="1~20", 2="21~40", 3="41~60"
 }
 ```
 
 #### Response
 ```json
 {
-  "status": "success",
-  "data": {
-    "placementId": 1,
-    "storePK": 1,
-    "layout": "배치 레이아웃",
-    "createdDate": "2023-10-01T12:00:00",
-    "updatedDate": "2023-10-01T12:00:00"
-  },
-  "message": "Placement created"
+    "status": "success",
+    "data": {
+        "placementPK": 1,
+        "storePK": 1,
+        "layout": {
+            "1": {
+                "x": 10,
+                "y": 10,
+                "table": 4,
+                "min": 2,
+                "status": 0
+            },
+            "2": {
+                "x": 20,
+                "y": 20,
+                "table": 2,
+                "min": 1,
+                "status": 0
+            }
+        },
+        "layoutSize": 1,
+        "createdDate": "2024-03-25T21:30:00",
+        "updatedDate": "2024-03-25T21:30:00"
+    },
+    "message": "자리 배치가 생성되었습니다."
 }
 ```
 
-### 모든 배치 조회 (Get All Placements)
-- **URL**: `/api/placement`
+### 가게별 자리 배치 조회 (Get Placement by Store)
+- **URL**: `/api/placement/store/{storePK}`
 - **HTTP Method**: GET
 
 #### Response
 ```json
 {
-  "status": "success",
-  "data": [
-    {
-      "placementId": 1,
-      "storePK": 1,
-      "layout": "배치 레이아웃",
-      "createdDate": "2023-10-01T12:00:00",
-      "updatedDate": "2023-10-01T12:00:00"
-    }
-  ],
-  "message": "All placements"
+    "status": "success",
+    "data": {
+        "placementPK": 1,
+        "storePK": 1,
+        "layout": {
+            "1": {
+                "x": 10,
+                "y": 10,
+                "table": 4,
+                "min": 2,
+                "status": 0
+            },
+            "2": {
+                "x": 20,
+                "y": 20,
+                "table": 2,
+                "min": 1,
+                "status": 1
+            }
+        },
+        "layoutSize": 1,
+        "createdDate": "2024-03-25T21:30:00",
+        "updatedDate": "2024-03-25T21:30:00"
+    },
+    "message": "가게의 자리 배치 정보를 조회했습니다."
 }
 ```
+
+### 자리 배치 수정 (Update Placement)
+- **URL**: `/api/placement/{placementPK}`
+- **HTTP Method**: PUT
+
+#### Request Body
+```json
+{
+    "layout": {
+        "1": {
+            "status": 2    // 0=빈자리, 1=예약, 2=사용중
+        },
+        "2": {
+            "status": 1
+        }
+    }
+}
+```
+
+#### Response
+```json
+{
+    "status": "success",
+    "data": {
+        "placementPK": 1,
+        "storePK": 1,
+        "layout": {
+            "1": {
+                "x": 10,
+                "y": 10,
+                "table": 4,
+                "min": 2,
+                "status": 2
+            },
+            "2": {
+                "x": 20,
+                "y": 20,
+                "table": 2,
+                "min": 1,
+                "status": 1
+            }
+        },
+        "layoutSize": 1,
+        "createdDate": "2024-03-25T21:30:00",
+        "updatedDate": "2024-03-25T21:35:00"
+    },
+    "message": "자리 배치가 업데이트되었습니다."
+}
+```
+
+#### 자동 자리 상태 업데이트
+- **설명**: 시스템이 30분마다 자동으로 실행하여 예약된 자리의 상태를 업데이트합니다.
+- **동작 방식**:
+  1. 현재 시간으로부터 30분 이내의 예약을 조회
+  2. 각 예약에 대해:
+     - 해당 가게의 자리 배치 정보 조회
+     - 예약된 테이블 번호와 일치하는 자리의 상태가 빈자리(0)인 경우
+     - 자동으로 예약 상태(1)로 변경
+- **상태 코드**:
+  - `0`: 빈자리
+  - `1`: 예약됨
+  - `2`: 사용중
+
+#### 주의사항
+1. 자리 배치 수정 시 테이블의 위치(x, y), 최대/최소 인원은 변경할 수 없습니다.
+2. 자리 상태는 0(빈자리), 1(예약), 2(사용중) 중 하나여야 합니다.
+3. 예약 시간 30분 전부터 해당 테이블의 상태가 자동으로 예약 상태(1)로 변경됩니다.
+4. layoutSize는 1(1~20), 2(21~40), 3(41~60) 중 하나여야 합니다.
 
 ## 예약 (Reservation)
 

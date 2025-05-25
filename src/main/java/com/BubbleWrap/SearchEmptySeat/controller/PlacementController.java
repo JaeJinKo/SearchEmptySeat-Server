@@ -3,6 +3,7 @@ package com.BubbleWrap.SearchEmptySeat.controller;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.placement.PlacementRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.placement.PlacementResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.placement.PlacementUpdateRequest;
 import com.BubbleWrap.SearchEmptySeat.service.PlacementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,19 @@ public class PlacementController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PlacementResponse>> create(@RequestBody PlacementRequest request) {
+    public ResponseEntity<ApiResponse<PlacementResponse>> createPlacement(@RequestBody PlacementRequest request) {
         return placementService.createPlacement(request);
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<PlacementResponse>>> getAll() {
-        return placementService.getAllPlacements();
+    @GetMapping("/store/{storePK}")
+    public ResponseEntity<ApiResponse<PlacementResponse>> getPlacementByStore(@PathVariable Long storePK) {
+        return placementService.getPlacementByStore(storePK);
+    }
+
+    @PutMapping("/{placementPK}")
+    public ResponseEntity<ApiResponse<PlacementResponse>> updatePlacement(
+            @PathVariable Long placementPK,
+            @RequestBody PlacementUpdateRequest request) {
+        return placementService.updatePlacement(placementPK, request);
     }
 }

@@ -33,9 +33,11 @@ public enum ErrorCode {
     FAVORITE_NOT_FOUND("ERROR-0206", "The store has already been removed from list."),
     STORE_VIEWS_NOT_FOUND("ERROR-0207", "The store view information could not be verified."),
     FAILED_CANCEL_RESERVATION("ERROR-0208", "Cannot cancel reservation within 30 minutes of the reservation time"),
+    PLACEMENT_NOT_FOUND("ERROR-0209", "자리 배치 정보를 찾을 수 없습니다."),
     // ERROR-0300
 
     NOT_PUOND("ERROR-9999", "test")
+    
     ;
 
 

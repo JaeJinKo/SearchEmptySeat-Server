@@ -21,6 +21,7 @@ public class Reservation {
     private Long storePK;    // FK -> store
     private int reservationNum;
     private LocalDateTime reservationTime;
+    private int tableNumber; // 예약된 테이블 번호
 
     @Convert(converter = JsonConverterMap.class)
     private Map<String, Object> menu; // JSON (선택 메뉴)
