@@ -37,6 +37,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa") // JPA
 	implementation("org.springframework.boot:spring-boot-starter-validation") // 입력 검증
 	implementation("com.fasterxml.jackson.core:jackson-databind") // JSON 처리
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310") // Java 8 날짜/시간 지원
 	runtimeOnly("org.postgresql:postgresql") // PostgreSQL (DB에 따라 변경)
 	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
@@ -47,7 +48,6 @@ dependencies {
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	implementation("io.github.cdimascio:dotenv-java:3.0.0")
 	implementation("org.springframework.boot:spring-boot-starter-mail")
-
 }
 
 tasks.withType<Test> {

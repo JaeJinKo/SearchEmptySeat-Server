@@ -1,15 +1,25 @@
 package com.BubbleWrap.SearchEmptySeat.dto.common;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
 public class ApiResponse<T> {
     private String status;
     private T data;
     private String message;
+
+    // Getter 메서드 추가
+    public String getStatus() {
+        return status;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 
     // 성공 응답
     public static <T> ApiResponse<T> success(T data, String message) {

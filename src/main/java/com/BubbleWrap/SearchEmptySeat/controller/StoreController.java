@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,15 +26,20 @@ import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.service.StoreService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @RestController
 @RequestMapping("/api/store")
 public class StoreController {
 
+    private static final Logger logger = LoggerFactory.getLogger(StoreController.class);
     private final StoreService storeService;
+    private final ObjectMapper objectMapper;
 
     public StoreController(StoreService storeService) {
         this.storeService = storeService;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     @PostMapping("/register")
@@ -88,7 +95,24 @@ public class StoreController {
 
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<StoreResponse>>> searchStoresByName(@RequestParam String storeName) {
-        return storeService.searchStoresByName(storeName);
+        logger.info("store search Request - target: {}", storeName);
+        ResponseEntity<ApiResponse<List<StoreResponse>>> response = storeService.searchStoresByName(storeName);
+        ApiResponse<List<StoreResponse>> apiResponse = response.getBody();
+        if (apiResponse != null) {
+            logger.info("store search Response - status: {}", apiResponse.getStatus());
+            logger.info("store search Response - message: {}", apiResponse.getMessage());
+            List<StoreResponse> stores = apiResponse.getData();
+            if (stores != null) {
+                logger.info("store search Result - number of stores: {}", stores.size());
+                try {
+                    String storesJson = objectMapper.writeValueAsString(stores);
+                    logger.info("store search Result - data: {}", storesJson);
+                } catch (JsonProcessingException e) {
+                    logger.error("Error converting stores to JSON: {}", e.getMessage());
+                }
+            }
+        }
+        return response;
     }
 
     @GetMapping("/{storeId}/reservations/stats")
