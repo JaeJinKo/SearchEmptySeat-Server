@@ -61,17 +61,27 @@ CREATE TABLE tbl_placement (
     updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (storePK) REFERENCES tbl_store(storePK)
 );
+CREATE TABLE tbl_menu_section (
+    sectionPK BIGSERIAL PRIMARY KEY,
+    storePK BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    priority INT NOT NULL,
+    createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (storePK) REFERENCES tbl_store(storePK)
+);
 CREATE TABLE tbl_menu (
     menuPK BIGSERIAL PRIMARY KEY,
     storePK BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    section VARCHAR(50),
+    sectionPK BIGINT,
     image JSON,
     price INT NOT NULL,
     description VARCHAR(255),
     isAvailable BOOLEAN DEFAULT TRUE,
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (storePK) REFERENCES tbl_store(storePK)
+    FOREIGN KEY (storePK) REFERENCES tbl_store(storePK),
+    FOREIGN KEY (sectionPK) REFERENCES tbl_menu_section(sectionPK)
 );
 CREATE TABLE tbl_reservation (
     reservationPK BIGSERIAL PRIMARY KEY,

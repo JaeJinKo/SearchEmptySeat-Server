@@ -9,8 +9,10 @@ import com.BubbleWrap.SearchEmptySeat.dto.menu.MenuStockDto;
 import com.BubbleWrap.SearchEmptySeat.dto.menu.OutOfStockRequest;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Menu;
+import com.BubbleWrap.SearchEmptySeat.model.MenuSection;
 import com.BubbleWrap.SearchEmptySeat.model.Store;
 import com.BubbleWrap.SearchEmptySeat.repository.MenuRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.MenuSectionRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
 import com.BubbleWrap.SearchEmptySeat.utils.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,26 +33,36 @@ import java.util.stream.Collectors;
 public class MenuService {
 
     private final MenuRepository menuRepository;
+    private final MenuSectionRepository menuSectionRepository;
     private final StoreRepository storeRepository;
     private final ObjectMapper objectMapper;
     private final FileStorageService fileStorageService;
 
     @Transactional
     public ResponseEntity<ApiResponse<Map<String, Object>>> addMenu(MenuRequest request, MultipartFile imageFile){
-//        Store store = storeRepository.findById(request.getStorePK())
-//                .orElse(null);
-//
-//        if(store==null) return ResponseEntity.badRequest()
-//                .body(ApiResponse.error(
-//                        ErrorCode.STORE_NOT_FOUND.getCode(),
-//                        ErrorCode.STORE_NOT_FOUND.getMessage()));
         Store store = storeRepository.findById(request.getStorePK())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        MenuSection section = null;
+        if (request.getSection() != null && !request.getSection().trim().isEmpty()) {
+            // 기존 섹션이 있는지 확인
+            section = menuSectionRepository.findByStoreAndName(store, request.getSection())
+                    .orElse(null);
+            
+            // 섹션이 없으면 새로 생성
+            if (section == null) {
+                section = new MenuSection();
+                section.setStore(store);
+                section.setName(request.getSection());
+                section.setPriority(request.getPriority());
+                menuSectionRepository.save(section);
+            }
+        }
 
         Menu menu = new Menu();
         menu.setStore(store);
         menu.setName(request.getName());
-        menu.setSection(request.getSection());
+        menu.setSection(section);
         menu.setPrice(request.getPrice());
         menu.setDescription(request.getDescription());
         menu.setAvailable(request.isAvailable());
@@ -67,9 +79,10 @@ public class MenuService {
         menuRepository.save(menu);
 
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("storeName", menu.getStore());
         responseData.put("name", menu.getName());
-        responseData.put("section", menu.getSection());
+        responseData.put("section", section != null ? section.getName() : null);
+        responseData.put("sectionPK", section != null ? section.getSectionPK() : null);
+        responseData.put("priority", section != null ? section.getPriority() : null);
         responseData.put("price", menu.getPrice());
         responseData.put("image", menu.getImage());
         responseData.put("Description", menu.getDescription());
@@ -98,10 +111,26 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_NOT_FOUND));
 
+        MenuSection section = null;
+        if (request.getSection() != null && !request.getSection().trim().isEmpty()) {
+            // 기존 섹션이 있는지 확인
+            section = menuSectionRepository.findByStoreAndName(menu.getStore(), request.getSection())
+                    .orElse(null);
+            
+            // 섹션이 없으면 새로 생성
+            if (section == null) {
+                section = new MenuSection();
+                section.setStore(menu.getStore());
+                section.setName(request.getSection());
+                section.setPriority(request.getPriority());
+                menuSectionRepository.save(section);
+            }
+        }
+
         Map<String, Object> responseData = new HashMap<>();
 
         menu.setName(request.getName());
-        menu.setSection(request.getSection());
+        menu.setSection(section);
         menu.setPrice(request.getPrice());
 
         String subDirectory = "store/" +menu.getStore().getStorePK() + "/menu";
@@ -124,7 +153,9 @@ public class MenuService {
 
         responseData.put("menuId", menuId);
         responseData.put("name", menu.getName());
-        responseData.put("section", menu.getSection());
+        responseData.put("section", section != null ? section.getName() : null);
+        responseData.put("sectionPK", section != null ? section.getSectionPK() : null);
+        responseData.put("priority", section != null ? section.getPriority() : null);
         responseData.put("price", menu.getPrice());
         responseData.put("image", menu.getImage());
         responseData.put("description", menu.getDescription());
@@ -141,7 +172,9 @@ public class MenuService {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("menuId", menuId);
         responseData.put("name", menu.getName());
-        responseData.put("section", menu.getSection());
+        responseData.put("section", menu.getSection() != null ? menu.getSection().getName() : null);
+        responseData.put("sectionPK", menu.getSection() != null ? menu.getSection().getSectionPK() : null);
+        responseData.put("priority", menu.getSection() != null ? menu.getSection().getPriority() : null);
         responseData.put("price", menu.getPrice());
         responseData.put("image", menu.getImage());
         responseData.put("description", menu.getDescription());

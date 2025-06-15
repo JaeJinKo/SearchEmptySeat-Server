@@ -15,10 +15,12 @@ public class MenuRequest {
 
     private String section;
 
+    private int priority;
+
     private int price;
 
     private String description;
 
-    @JsonProperty("isAvailable")
+    @JsonProperty("available")
     private boolean available;
 }

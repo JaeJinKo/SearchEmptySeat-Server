@@ -1,24 +1,22 @@
 package com.BubbleWrap.SearchEmptySeat.model;
 
-import com.BubbleWrap.SearchEmptySeat.utils.JsonConverterList;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "tbl_menu")
-public class Menu {
+@Table(name = "tbl_menu_section")
+public class MenuSection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long menuPK;
+    private Long sectionPK;
 
     @ManyToOne
     @JoinColumn(name = "storePK", nullable = false)
@@ -27,21 +25,16 @@ public class Menu {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "sectionPK")
-    private MenuSection section;
-
-    @Convert(converter = JsonConverterList.class)
-    private List<String> image;
-
     @Column(nullable = false)
-    private int price;
-
-    private String description;
-
-    @Column(nullable = false)
-    private boolean isAvailable = true;
+    private int priority;
 
     @Column(updatable = false)
     private LocalDateTime createdDate = LocalDateTime.now();
-}
+
+    private LocalDateTime updatedDate = LocalDateTime.now();
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedDate = LocalDateTime.now();
+    }
+} 

@@ -522,6 +522,7 @@
     "storePK": 1,
     "name": "아메리카노",
     "section": "음료",
+    "priority": 1,
     "price": 4000,
     "description": "신선한 아메리카노",
     "available": true
@@ -538,6 +539,8 @@
     "storeName": "맛있는 한식당",
     "name": "아메리카노",
     "section": "음료",
+    "sectionPK": 1,
+    "priority": 1,
     "price": 4000,
     "image": ["https://example.com/menu_image.jpg"],
     "Description": "신선한 아메리카노",
@@ -557,12 +560,19 @@
   "status": "success",
   "data": [
     {
+      "menuPK": 1,
       "name": "아메리카노",
-      "section": "음료",
+      "section": {
+        "sectionPK": 1,
+        "name": "음료",
+        "priority": 1,
+        "createdDate": "2023-10-01T12:00:00",
+        "updatedDate": "2023-10-01T12:00:00"
+      },
       "price": 4000,
       "image": ["https://example.com/menu_image.jpg"],
-      "Description": "신선한 아메리카노",
-      "available": true
+      "description": "신선한 아메리카노",
+      "isAvailable": true
     }
   ],
   "message": "View menus"
@@ -579,6 +589,7 @@
   "data": {
     "name": "카페라떼",
     "section": "음료",
+    "priority": 1,
     "price": 4500,
     "description": "부드러운 카페라떼",
     "available": true
@@ -595,6 +606,8 @@
     "menuId": 1,
     "name": "카페라떼",
     "section": "음료",
+    "sectionPK": 1,
+    "priority": 1,
     "price": 4500,
     "image": ["https://example.com/latte_image.jpg"],
     "description": "부드러운 카페라떼",
@@ -616,6 +629,8 @@
     "menuId": 1,
     "name": "카페라떼",
     "section": "음료",
+    "sectionPK": 1,
+    "priority": 1,
     "price": 4500,
     "image": ["https://example.com/latte_image.jpg"],
     "description": "부드러운 카페라떼",
@@ -652,6 +667,116 @@
     }
   ],
   "message": "Bulk stock update success"
+}
+```
+
+## 메뉴 섹션 (Menu Section)
+
+### 가게별 메뉴 섹션 조회 (Get Menu Sections by Store)
+- **URL**: `/api/menu-section/store/{storePK}`
+- **HTTP Method**: GET
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "sectionPK": 1,
+      "name": "음료",
+      "priority": 1,
+      "createdDate": "2023-10-01T12:00:00",
+      "updatedDate": "2023-10-01T12:00:00"
+    },
+    {
+      "sectionPK": 2,
+      "name": "메인",
+      "priority": 2,
+      "createdDate": "2023-10-01T12:00:00",
+      "updatedDate": "2023-10-01T12:00:00"
+    }
+  ],
+  "message": "Menu sections retrieved successfully"
+}
+```
+
+### 메뉴 섹션 수정 (Update Menu Section)
+- **URL**: `/api/menu-section/update/{sectionPK}`
+- **HTTP Method**: PUT
+
+#### Request Body
+```json
+{
+  "name": "음료류",
+  "priority": 1
+}
+```
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "sectionPK": 1,
+    "name": "음료류",
+    "priority": 1,
+    "updatedDate": "2023-10-01T12:00:00"
+  },
+  "message": "Menu section updated successfully"
+}
+```
+
+### 메뉴 섹션 삭제 (Delete Menu Section)
+- **URL**: `/api/menu-section/delete/{sectionPK}`
+- **HTTP Method**: DELETE
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "sectionPK": 1,
+    "name": "음료류",
+    "priority": 1
+  },
+  "message": "Menu section deleted successfully"
+}
+```
+
+### 메뉴 섹션 일괄 수정 (Bulk Update Menu Sections)
+- **URL**: `/api/menu-section/bulk-update/{storePK}`
+- **HTTP Method**: PUT
+
+#### Request Body
+```json
+[
+  { "sectionPK": 1, "name": "음료", "priority": 1 },
+  { "sectionPK": 2, "name": "메인", "priority": 2 },
+  { "sectionPK": 3, "name": "사이드", "priority": 3 }
+]
+```
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "sectionPK": 1,
+      "name": "음료",
+      "priority": 1,
+      "createdDate": "2023-10-01T12:00:00",
+      "updatedDate": "2023-10-01T12:00:00"
+    },
+    {
+      "sectionPK": 2,
+      "name": "메인",
+      "priority": 2,
+      "createdDate": "2023-10-01T12:00:00",
+      "updatedDate": "2023-10-01T12:00:00"
+    }
+  ],
+  "message": "Menu sections updated successfully"
 }
 ```
 

@@ -2,6 +2,7 @@ package com.BubbleWrap.SearchEmptySeat.exception;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<String>> handleValidationException(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_INPUT.getCode(), ErrorCode.INVALID_INPUT.getMessage()));
+    }
+
+    // 데이터 무결성 위반 (중복 키 등)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<String>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        String message = ex.getMessage();
+        if (message != null && message.contains("business_registration_number")) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.BUSINESS_REGISTRATION_NUMBER_ALREADY_EXISTS.getCode(), ErrorCode.BUSINESS_REGISTRATION_NUMBER_ALREADY_EXISTS.getMessage()));
+        }
+        return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_INPUT.getCode(), "데이터 무결성 위반: " + ex.getMessage()));
     }
 
     // 예상하지 못한 서버 오류 처리

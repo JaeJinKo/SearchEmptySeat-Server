@@ -14,7 +14,7 @@ public class MenuResponse {
 
     private String name;
 
-    private String section;
+    private MenuSectionResponse section;
 
     private List<String> image;
 
@@ -27,7 +27,7 @@ public class MenuResponse {
     public MenuResponse(Menu menu, ObjectMapper objectMapper) {
         this.menuPK = menu.getMenuPK();
         this.name = menu.getName();
-        this.section = menu.getSection();
+        this.section = menu.getSection() != null ? new MenuSectionResponse(menu.getSection()) : null;
         this.image = menu.getImage();
         this.price = menu.getPrice();
         this.description = menu.getDescription();
