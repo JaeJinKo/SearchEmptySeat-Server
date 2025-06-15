@@ -11,6 +11,7 @@ public class PlacementResponse {
     private Long placementPK;
     private Long storePK;
     private Map<String, Object> layout;
+    private int layoutSize;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
@@ -18,6 +19,7 @@ public class PlacementResponse {
         this.placementPK = p.getPlacementPK();
         this.storePK = p.getStorePK();
         this.layout = p.getLayout();
+        this.layoutSize = p.getLayoutSize();
         this.createdDate = p.getCreatedDate();
         this.updatedDate = p.getUpdatedDate();
     }

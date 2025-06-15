@@ -57,6 +57,7 @@ CREATE TABLE tbl_placement (
     placementPK BIGSERIAL PRIMARY KEY,
     storePK BIGINT NOT NULL,
     layout JSON,
+    layoutSize INT,
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (storePK) REFERENCES tbl_store(storePK)
