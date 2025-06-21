@@ -29,6 +29,7 @@ public enum ErrorCode {
     INVALID_CATEGORY("ERROR-0202", "유효하지 않은 카테고리입니다."),
     MENU_NOT_FOUND("ERROR-0203", "Menu not found"),
     MENU_SECTION_NOT_FOUND("ERROR-0210", "메뉴 섹션을 찾을 수 없습니다."),
+    MENU_SECTION_ALREADY_EXISTS("ERROR-0212", "이미 존재하는 메뉴 섹션입니다."),
     BUSINESS_REGISTRATION_NUMBER_ALREADY_EXISTS("ERROR-0211", "이미 등록된 사업자등록번호입니다."),
     UNAUTHORIZED_ACCESS("ERROR-0204", "Not the owner of the store."),
     ALREADY_FAVORITED("ERROR-0205", "This is a store that has already been added to list."),

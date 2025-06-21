@@ -73,6 +73,33 @@ public class MenuSectionService {
     }
 
     @Transactional
+    public ResponseEntity<ApiResponse<Map<String, Object>>> addSection(Long storePK, MenuSectionRequest request) {
+        Store store = storeRepository.findById(storePK)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        // 동일한 이름의 섹션이 이미 존재하는지 확인
+        if (menuSectionRepository.findByStoreAndName(store, request.getName()).isPresent()) {
+            throw new BusinessException(ErrorCode.MENU_SECTION_ALREADY_EXISTS);
+        }
+
+        MenuSection section = new MenuSection();
+        section.setStore(store);
+        section.setName(request.getName());
+        section.setPriority(request.getPriority());
+
+        menuSectionRepository.save(section);
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("sectionPK", section.getSectionPK());
+        responseData.put("name", section.getName());
+        responseData.put("priority", section.getPriority());
+        responseData.put("createdDate", section.getCreatedDate());
+        responseData.put("updatedDate", section.getUpdatedDate());
+
+        return ResponseEntity.ok(ApiResponse.success(responseData, "Menu section added successfully"));
+    }
+
+    @Transactional
     public ResponseEntity<ApiResponse<?>> bulkUpdateSections(Long storePK, java.util.List<MenuSectionBulkUpdateRequest> requests) {
         java.util.List<MenuSectionResponse> updated = new java.util.ArrayList<>();
         for (MenuSectionBulkUpdateRequest req : requests) {

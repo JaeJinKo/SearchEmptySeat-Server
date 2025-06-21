@@ -24,6 +24,13 @@ public class MenuSectionController {
         return menuSectionService.getSectionsByStore(storePK);
     }
 
+    @PostMapping("/add/{storePK}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> addSection(
+            @PathVariable Long storePK,
+            @RequestBody MenuSectionRequest request) {
+        return menuSectionService.addSection(storePK, request);
+    }
+
     @PutMapping("/update/{sectionPK}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateSection(
             @PathVariable Long sectionPK,

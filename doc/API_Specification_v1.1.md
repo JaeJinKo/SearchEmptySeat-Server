@@ -700,6 +700,33 @@
 }
 ```
 
+### 메뉴 섹션 추가 (Add Menu Section)
+- **URL**: `/api/menu-section/add/{storePK}`
+- **HTTP Method**: POST
+
+#### Request Body
+```json
+{
+  "name": "디저트",
+  "priority": 3
+}
+```
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "sectionPK": 3,
+    "name": "디저트",
+    "priority": 3,
+    "createdDate": "2023-10-01T12:00:00",
+    "updatedDate": "2023-10-01T12:00:00"
+  },
+  "message": "Menu section added successfully"
+}
+```
+
 ### 메뉴 섹션 수정 (Update Menu Section)
 - **URL**: `/api/menu-section/update/{sectionPK}`
 - **HTTP Method**: PUT
