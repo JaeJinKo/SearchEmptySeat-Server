@@ -37,10 +37,6 @@ public class Reservation {
     @Column(name = "menu")
     private Map<String, Object> menu; // JSON (선택 메뉴)
 
-    @Convert(converter = JsonConverterMap.class)
-    @Column(name = "placement")
-    private Map<String, Object> placement; // JSON (좌석 정보)
-
     @Column(name = "seats")
     private String seats;
 

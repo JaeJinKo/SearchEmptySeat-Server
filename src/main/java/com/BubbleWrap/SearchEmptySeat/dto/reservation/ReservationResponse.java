@@ -13,6 +13,7 @@ public class ReservationResponse {
     private Long storePK;
     private int reservationNum;
     private LocalDateTime reservationTime;
+    private int tableNumber;
     private Map<String, Object> menu;
     private String seats;
     private int partySize;
@@ -27,6 +28,7 @@ public class ReservationResponse {
         this.storePK = r.getStorePK();
         this.reservationNum = r.getReservationNum();
         this.reservationTime = r.getReservationTime();
+        this.tableNumber = r.getTableNumber();
         this.menu = r.getMenu();
         this.seats = r.getSeats();
         this.partySize = r.getPartySize();

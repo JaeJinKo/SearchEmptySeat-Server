@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class FileStorageService {
@@ -22,8 +23,9 @@ public class FileStorageService {
      * 단일 파일을 저장하는 메서드
      * @param userId 파일명 생성 시 사용할 사용자 ID
      * @param subDirectory 저장할 하위 폴더 (예: "member/profile")
+     * @param fileName 파일명에 붙일 접두어 (예: "profile")
      * @param file 저장할 MultipartFile
-     * @return 저장된 파일의 상대 경로 (예: "member/profile/1_profile.png")
+     * @return 저장된 파일의 상대 경로 (예: "member/profile/uuid_profile.png")
      */
     public String saveSingleFile(Long userId, String subDirectory, String fileName, MultipartFile file) {
         if (file == null || file.isEmpty()) {
@@ -43,15 +45,17 @@ public class FileStorageService {
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
         }
-        // 파일명: "{userId}_profile{extension}"
-        String newFilename = userId + "_" + fileName + extension;
+        
+        // 파일명: "uuid_fileName{extension}" (고유한 UUID 사용)
+        String uuid = UUID.randomUUID().toString();
+        String newFilename = uuid + "_" + fileName + extension;
         File dest = new File(targetDir, newFilename);
         try {
             file.transferTo(dest);
         } catch (IOException e) {
             throw new BusinessException(ErrorCode.IMAGE_SAVE_ERROR);
         }
-        // DB에 저장할 상대경로 (예: "member/profile/1_profile.png")
+        // DB에 저장할 상대경로 (예: "member/profile/uuid_profile.png")
         return subDirectory + "/" + newFilename;
     }
 
@@ -63,7 +67,7 @@ public class FileStorageService {
      * @param fileName 파일명에 붙일 접두어 (예: "menu")
      * @return 저장된 파일들의 상대 경로 리스트
      */
-    public List<String> saveMultipleFiles(Long userId, String subDirectory, String fileName,List<MultipartFile> files) {
+    public List<String> saveMultipleFiles(Long userId, String subDirectory, String fileName, List<MultipartFile> files) {
         List<String> savedPaths = new ArrayList<>();
         if (files == null || files.isEmpty()) {
             return savedPaths;
@@ -85,8 +89,9 @@ public class FileStorageService {
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
             }
-            // 파일명: "{userId}_{fileName}_{인덱스}{extension}" (인덱스 1부터 시작)
-            String newFilename = userId + "_" + fileName + "_" + (i + 1) + extension;
+            // 파일명: "uuid_fileName_{인덱스}{extension}" (고유한 UUID 사용)
+            String uuid = UUID.randomUUID().toString();
+            String newFilename = uuid + "_" + fileName + "_" + (i + 1) + extension;
             File dest = new File(targetDir, newFilename);
             try {
                 file.transferTo(dest);

@@ -72,7 +72,7 @@ public class MenuService {
         List<String> profileImagePath = new ArrayList<>();
         String subDirectory = "store/" +menu.getStore().getStorePK() + "/menu";
         if (imageFile != null && !imageFile.isEmpty()) {
-            profileImagePath.add(fileStorageService.saveSingleFile(menu.getMenuPK(), subDirectory, "meun", imageFile));
+            profileImagePath.add(fileStorageService.saveSingleFile(menu.getMenuPK(), subDirectory, "menu", imageFile));
             menu.setImage(profileImagePath);
         }
 
@@ -135,7 +135,7 @@ public class MenuService {
 
         String subDirectory = "store/" +menu.getStore().getStorePK() + "/menu";
         if (imageFile != null && !imageFile.isEmpty()) {
-            String savedImagePath = fileStorageService.saveSingleFile(menu.getMenuPK(), subDirectory, "meun", imageFile);
+            String savedImagePath = fileStorageService.saveSingleFile(menu.getMenuPK(), subDirectory, "menu", imageFile);
 
             List<String> currentImages = menu.getImage();
             if (currentImages == null) {

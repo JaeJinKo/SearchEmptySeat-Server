@@ -90,6 +90,7 @@ CREATE TABLE tbl_reservation (
     storePK BIGINT NOT NULL,
     reservationNum INT NOT NULL,
     reservationTime TIMESTAMP NOT NULL,
+    table_num INT,
     menu JSON,
     seats VARCHAR(255),
     partySize INT NOT NULL,

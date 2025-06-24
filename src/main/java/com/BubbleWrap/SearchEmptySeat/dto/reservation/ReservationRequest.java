@@ -13,6 +13,7 @@ public class ReservationRequest {
     private Long storePK;
     private int reservationNum;
     private LocalDateTime reservationTime;
+    private int tableNumber;
     private Map<String, Object> menu;
     private String seats;
     private int partySize;

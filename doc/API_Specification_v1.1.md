@@ -542,7 +542,7 @@
     "sectionPK": 1,
     "priority": 1,
     "price": 4000,
-    "image": ["https://example.com/menu_image.jpg"],
+    "image": ["store/1/menu/a1b2c3d4-e5f6-7890-abcd-ef1234567890_menu.png"],
     "Description": "신선한 아메리카노",
     "available": true
   },
@@ -570,7 +570,7 @@
         "updatedDate": "2023-10-01T12:00:00"
       },
       "price": 4000,
-      "image": ["https://example.com/menu_image.jpg"],
+      "image": ["store/1/menu/a1b2c3d4-e5f6-7890-abcd-ef1234567890_menu.png"],
       "description": "신선한 아메리카노",
       "isAvailable": true
     }
@@ -609,7 +609,7 @@
     "sectionPK": 1,
     "priority": 1,
     "price": 4500,
-    "image": ["https://example.com/latte_image.jpg"],
+    "image": ["store/1/menu/xyz789abc123def456_menu.jpg"],
     "description": "부드러운 카페라떼",
     "available": true
   },
@@ -632,7 +632,7 @@
     "sectionPK": 1,
     "priority": 1,
     "price": 4500,
-    "image": ["https://example.com/latte_image.jpg"],
+    "image": ["store/1/menu/xyz789abc123def456_menu.jpg"],
     "description": "부드러운 카페라떼",
     "available": true
   },
@@ -697,33 +697,6 @@
     }
   ],
   "message": "Menu sections retrieved successfully"
-}
-```
-
-### 메뉴 섹션 추가 (Add Menu Section)
-- **URL**: `/api/menu-section/add/{storePK}`
-- **HTTP Method**: POST
-
-#### Request Body
-```json
-{
-  "name": "디저트",
-  "priority": 3
-}
-```
-
-#### Response
-```json
-{
-  "status": "success",
-  "data": {
-    "sectionPK": 3,
-    "name": "디저트",
-    "priority": 3,
-    "createdDate": "2023-10-01T12:00:00",
-    "updatedDate": "2023-10-01T12:00:00"
-  },
-  "message": "Menu section added successfully"
 }
 ```
 
@@ -1269,14 +1242,44 @@
 }
 ```
 
-## 파일 (File)
+## 파일 서빙 (File Serving)
 
-### 파일 서빙 (Serve File)
-- **URL**: `/api/files/{folder1}/{folder2}/{filename}`
+### 이미지 파일 서빙
+- **URL**: `/api/files/**`
 - **HTTP Method**: GET
 
+#### 설명
+유연한 경로 매칭을 통해 다양한 깊이의 파일 경로를 지원합니다.
+
+#### 지원하는 경로 패턴
+- **멤버 프로필**: `/api/files/member/profile/{uuid}_profile.{ext}`
+- **매장 이미지**: `/api/files/store/{storeId}/{uuid}_store.{ext}`
+- **메뉴 이미지**: `/api/files/store/{storeId}/menu/{uuid}_menu.{ext}`
+- **리뷰 이미지**: `/api/files/review/{reviewId}/{uuid}_review.{ext}`
+
+#### 지원하는 파일 형식
+- **확장자**: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`
+- **MIME 타입**: `image/png`, `image/jpeg`, `image/gif`, `image/webp`
+- **최대 파일 크기**: 100MB
+
+#### 보안 조치
+- 경로 순회 공격 방지 (`..`, `//`, `\\` 차단)
+- 허용된 경로 패턴만 접근 가능
+- 파일 확장자 및 MIME 타입 검증
+- 파일 크기 제한
+
 #### Response
-- 파일의 바이너리 데이터
+```json
+// 성공 시: 이미지 파일 바이너리 데이터
+// 실패 시: 404 Not Found 또는 400 Bad Request
+```
+
+#### 예시
+```
+GET /api/files/member/profile/a1b2c3d4-e5f6-7890-abcd-ef1234567890_profile.png
+GET /api/files/store/1/menu/xyz789abc123def456_menu.jpg
+GET /api/files/store/1/abc123def456_store.png
+```
 
 ## 게시판 (Board)
 

@@ -28,6 +28,7 @@ public class ReservationService {
         r.setStorePK(request.getStorePK());
         r.setReservationNum(request.getReservationNum());
         r.setReservationTime(request.getReservationTime());
+        r.setTableNumber(request.getTableNumber());
         r.setMenu(request.getMenu());
         r.setSeats(request.getSeats());
         r.setPartySize(request.getPartySize());
