@@ -5,6 +5,7 @@ import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.placement.PlacementRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.placement.PlacementResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.placement.PlacementUpdateRequest;
+import com.BubbleWrap.SearchEmptySeat.dto.placement.TableLayoutData;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Placement;
 import com.BubbleWrap.SearchEmptySeat.model.Reservation;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class PlacementService {
@@ -34,7 +36,7 @@ public class PlacementService {
     public ResponseEntity<ApiResponse<PlacementResponse>> createPlacement(PlacementRequest request) {
         Placement p = new Placement();
         p.setStorePK(request.getStorePK());
-        p.setLayout(request.getLayout());
+        p.setLayout(convertTableLayoutDataToMap(request.getLayout()));
         p.setLayoutSize(request.getLayoutSize());
         p.setCreatedDate(LocalDateTime.now());
         p.setUpdatedDate(LocalDateTime.now());
@@ -61,7 +63,7 @@ public class PlacementService {
 
         // 레이아웃 업데이트
         Map<String, Object> layout = placement.getLayout();
-        Map<String, Object> updateLayout = request.getLayout();
+        Map<String, Object> updateLayout = convertTableLayoutDataToMap(request.getLayout());
         
         // 각 테이블의 상태만 업데이트
         for (Map.Entry<String, Object> entry : updateLayout.entrySet()) {
@@ -81,6 +83,32 @@ public class PlacementService {
         return ResponseEntity.ok(
                 ApiResponse.success(new PlacementResponse(placement), "자리 배치가 업데이트되었습니다.")
         );
+    }
+
+    /**
+     * Map<String, TableLayoutData>를 Map<String, Object>로 변환
+     */
+    private Map<String, Object> convertTableLayoutDataToMap(Map<String, TableLayoutData> layoutData) {
+        if (layoutData == null) {
+            return new HashMap<>();
+        }
+        
+        Map<String, Object> layoutMap = new HashMap<>();
+        for (Map.Entry<String, TableLayoutData> entry : layoutData.entrySet()) {
+            String tableNumber = entry.getKey();
+            TableLayoutData tableLayoutData = entry.getValue();
+            
+            Map<String, Object> tableMap = new HashMap<>();
+            tableMap.put("x", tableLayoutData.getX());
+            tableMap.put("y", tableLayoutData.getY());
+            tableMap.put("table", tableLayoutData.getTable());
+            tableMap.put("min", tableLayoutData.getMin());
+            tableMap.put("status", tableLayoutData.getStatus());
+            
+            layoutMap.put(tableNumber, tableMap);
+        }
+        
+        return layoutMap;
     }
 
     @Scheduled(fixedRate = 1800000) // 30분마다 실행

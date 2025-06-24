@@ -8,5 +8,5 @@ import java.util.Map;
 @Getter
 @Setter
 public class PlacementUpdateRequest {
-    private Map<String, Object> layout;
+    private Map<String, TableLayoutData> layout;
 } 
