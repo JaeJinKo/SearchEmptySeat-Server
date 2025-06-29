@@ -44,6 +44,12 @@ public class Store {
     @Convert(converter = JsonConverterMap.class)
     private Map<String, String> businessHours;
 
+    @Convert(converter = JsonConverterMap.class)
+    private Map<String, Integer> regularHolidays; // 요일별 휴무일 (0=영업, 1=휴무)
+
+    @Convert(converter = JsonConverterList.class)
+    private List<String> temporaryHolidays; // 임시 휴무일 (날짜 리스트)
+
     @Convert(converter = JsonConverterList.class)
     private List<String> image;
 
@@ -99,6 +105,14 @@ public class Store {
 
     public Map<String, String> getBusinessHours() {
         return businessHours;
+    }
+
+    public Map<String, Integer> getRegularHolidays() {
+        return regularHolidays;
+    }
+
+    public List<String> getTemporaryHolidays() {
+        return temporaryHolidays;
     }
 
     public List<String> getImage() {

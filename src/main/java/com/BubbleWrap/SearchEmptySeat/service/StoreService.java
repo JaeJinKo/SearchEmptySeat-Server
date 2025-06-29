@@ -78,6 +78,8 @@ public class StoreService {
         store.setDepositor(request.getDepositor());
         store.setCategory(request.getCategory());
         store.setBusinessHours(request.getBusinessHours());
+        store.setRegularHolidays(request.getRegularHolidays());
+        store.setTemporaryHolidays(request.getTemporaryHolidays());
         storeRepository.save(store);
 
         String subDirectory = "store/"+ store.getStorePK();
@@ -100,6 +102,8 @@ public class StoreService {
         responseData.put("accountNumber", store.getAccountNumber());
         responseData.put("depositor", store.getDepositor());
         responseData.put("businessHours", store.getBusinessHours());
+        responseData.put("regularHolidays", store.getRegularHolidays());
+        responseData.put("temporaryHolidays", store.getTemporaryHolidays());
         responseData.put("image", store.getImage());
         responseData.put("category", store.getCategory());
         responseData.put("viewCount", 0);
@@ -126,6 +130,8 @@ public class StoreService {
         if (request.getLocation() != null) store.setLocation(request.getLocation());
         if (request.getDescription() != null) store.setDescription(request.getDescription());
         if (request.getBusinessHours() != null) store.setBusinessHours(request.getBusinessHours());
+        if (request.getRegularHolidays() != null) store.setRegularHolidays(request.getRegularHolidays());
+        if (request.getTemporaryHolidays() != null) store.setTemporaryHolidays(request.getTemporaryHolidays());
         if (request.getCategory() != null) store.setCategory(request.getCategory());
         if (request.getBank() != null) store.setBank(request.getBank());
         if (request.getAccountNumber() != null) store.setAccountNumber(request.getAccountNumber());
@@ -151,6 +157,8 @@ public class StoreService {
         responseData.put("location", store.getLocation());
         responseData.put("description", store.getDescription());
         responseData.put("businessHours", store.getBusinessHours());
+        responseData.put("regularHolidays", store.getRegularHolidays());
+        responseData.put("temporaryHolidays", store.getTemporaryHolidays());
         responseData.put("category", store.getCategory());
         responseData.put("bank", store.getBank());
         responseData.put("accountNumber", store.getAccountNumber());

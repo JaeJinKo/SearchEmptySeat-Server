@@ -38,6 +38,8 @@ CREATE TABLE tbl_store (
     accountNumber VARCHAR(50),
     depositor VARCHAR(50),
     businessHours JSON,
+    regularHolidays JSON,
+    temporaryHolidays JSON,
     image JSON,
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

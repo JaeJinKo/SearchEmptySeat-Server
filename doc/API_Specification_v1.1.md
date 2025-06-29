@@ -181,8 +181,27 @@
     "category": ["KOREANFOOD", "MEAT"],
     "businessHours": {
       "월요일": "09:00 - 22:00",
-      "화요일": "09:00 - 22:00"
-    }
+      "화요일": "09:00 - 22:00",
+      "수요일": "09:00 - 22:00",
+      "목요일": "09:00 - 22:00",
+      "금요일": "09:00 - 22:00",
+      "토요일": "10:00 - 21:00",
+      "일요일": "10:00 - 20:00"
+    },
+    "regularHolidays": {
+      "월요일": 0,
+      "화요일": 0,
+      "수요일": 0,
+      "목요일": 0,
+      "금요일": 0,
+      "토요일": 0,
+      "일요일": 1
+    },
+    "temporaryHolidays": [
+      "2024-01-01",
+      "2024-02-09",
+      "2024-02-10"
+    ]
   },
   "images": ["<MultipartFile>"]
 }
@@ -202,43 +221,82 @@
     "depositor": "김사장",
     "businessHours": {
       "월요일": "09:00 - 22:00",
-      "화요일": "09:00 - 22:00"
+      "화요일": "09:00 - 22:00",
+      "수요일": "09:00 - 22:00",
+      "목요일": "09:00 - 22:00",
+      "금요일": "09:00 - 22:00",
+      "토요일": "10:00 - 21:00",
+      "일요일": "10:00 - 20:00"
     },
-    "image": [
-      "https://example.com/image1.jpg",
-      "https://example.com/image2.jpg"
+    "regularHolidays": {
+      "월요일": 0,
+      "화요일": 0,
+      "수요일": 0,
+      "목요일": 0,
+      "금요일": 0,
+      "토요일": 0,
+      "일요일": 1
+    },
+    "temporaryHolidays": [
+      "2024-01-01",
+      "2024-02-09",
+      "2024-02-10"
     ],
+    "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"],
     "category": ["KOREANFOOD", "MEAT"],
-    "viewCount": 0,
-    "averageRating": 0.0,
-    "favoriteCount": 0,
-    "reservationCount": 0
+    "viewCount": 0
   },
   "message": "Store registration successful"
 }
 ```
 
-### 가게 정보 수정 (Update Store)
-- **URL**: `/api/store/update/{storeId}`
+### 가게 수정 (Update Store)
+- **URL**: `/api/store/{storeId}`
 - **HTTP Method**: PUT
+- **Content-Type**: `multipart/form-data`
 
 #### Request Parameters
+- **storeId**: 가게 ID (Long, 필수)
+- **storeName**: 가게명 (String, 선택)
+- **location**: 위치 (String, 선택)
+- **description**: 설명 (String, 선택)
+- **businessRegistrationNumber**: 사업자등록번호 (String, 선택)
+- **bank**: 은행명 (String, 선택)
+- **accountNumber**: 계좌번호 (String, 선택)
+- **depositor**: 예금주 (String, 선택)
+- **businessHours**: 영업시간 (Map<String, String>, 선택)
+- **regularHolidays**: 정기 휴무일 (Map<String, Integer>, 선택) - 0=영업, 1=휴무
+- **temporaryHolidays**: 임시 휴무일 (List<String>, 선택) - 날짜 리스트
+- **category**: 카테고리 (List<StoreCategory>, 선택)
+- **imageFiles**: 이미지 파일들 (MultipartFile[], 선택)
+
+#### 특징
+- **부분 업데이트 지원**: 모든 필드가 선택적이므로 필요한 필드만 전송하여 업데이트 가능
+- **기존 데이터 유지**: 전송하지 않은 필드는 기존 값으로 유지
+
+#### 예시 요청 (임시 휴무일만 업데이트)
 ```json
 {
-  "data": {
-    "storeName": "업데이트된 가게",
-    "location": "Busan",
-    "description": "업데이트된 설명",
-    "businessHours": {
-      "월요일": "10:00 - 20:00",
-      "화요일": "10:00 - 20:00"
-    },
-    "category": ["RESTAURANT"],
-    "bank": "신한은행",
-    "accountNumber": "987654-32-109876",
-    "depositor": "박사장"
-  },
-  "images": ["<MultipartFile>"]
+  "temporaryHolidays": [
+    "2024-12-25",
+    "2024-12-31",
+    "2025-01-01"
+  ]
+}
+```
+
+#### 예시 요청 (정기 휴무일만 업데이트)
+```json
+{
+  "regularHolidays": {
+    "월요일": 0,
+    "화요일": 0,
+    "수요일": 0,
+    "목요일": 0,
+    "금요일": 0,
+    "토요일": 0,
+    "일요일": 1
+  }
 }
 ```
 
@@ -247,28 +305,45 @@
 {
   "status": "success",
   "data": {
-    "storeName": "업데이트된 가게",
-    "location": "Busan",
-    "description": "업데이트된 설명",
+    "storeName": "맛있는 한식당",
+    "location": "서울시 강남구",
+    "description": "한식 전문점입니다.",
+    "businessRegistrationNumber": "123-45-67890",
+    "bank": "국민은행",
+    "accountNumber": "123456-78-901234",
+    "depositor": "김사장",
     "businessHours": {
-      "월요일": "10:00 - 20:00",
-      "화요일": "10:00 - 20:00"
+      "월요일": "09:00 - 22:00",
+      "화요일": "09:00 - 22:00",
+      "수요일": "09:00 - 22:00",
+      "목요일": "09:00 - 22:00",
+      "금요일": "09:00 - 22:00",
+      "토요일": "10:00 - 21:00",
+      "일요일": "10:00 - 20:00"
     },
-    "category": ["RESTAURANT"],
-    "bank": "신한은행",
-    "accountNumber": "987654-32-109876",
-    "depositor": "박사장",
-    "image": [
-      "https://example.com/updated_image1.jpg",
-      "https://example.com/updated_image2.jpg"
-    ]
+    "regularHolidays": {
+      "월요일": 0,
+      "화요일": 0,
+      "수요일": 0,
+      "목요일": 0,
+      "금요일": 0,
+      "토요일": 0,
+      "일요일": 1
+    },
+    "temporaryHolidays": [
+      "2024-12-25",
+      "2024-12-31",
+      "2025-01-01"
+    ],
+    "category": ["KOREANFOOD", "MEAT"],
+    "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"]
   },
   "message": "Store update successful"
 }
 ```
 
-### 사용자 가게 목록 조회 (Get User Stores)
-- **URL**: `/api/store/my`
+### 내 가게 목록 조회 (Get My Stores)
+- **URL**: `/api/store/my-stores`
 - **HTTP Method**: GET
 
 #### Response
@@ -277,6 +352,7 @@
   "status": "success",
   "data": [
     {
+      "storePK": 1,
       "storeName": "맛있는 한식당",
       "location": "서울시 강남구",
       "description": "한식 전문점입니다.",
@@ -286,32 +362,48 @@
       "depositor": "김사장",
       "businessHours": {
         "월요일": "09:00 - 22:00",
-        "화요일": "09:00 - 22:00"
+        "화요일": "09:00 - 22:00",
+        "수요일": "09:00 - 22:00",
+        "목요일": "09:00 - 22:00",
+        "금요일": "09:00 - 22:00",
+        "토요일": "10:00 - 21:00",
+        "일요일": "10:00 - 20:00"
       },
-      "image": [
-        "https://example.com/image1.jpg",
-        "https://example.com/image2.jpg"
+      "regularHolidays": {
+        "월요일": 0,
+        "화요일": 0,
+        "수요일": 0,
+        "목요일": 0,
+        "금요일": 0,
+        "토요일": 0,
+        "일요일": 1
+      },
+      "temporaryHolidays": [
+        "2024-01-01",
+        "2024-02-09",
+        "2024-02-10"
       ],
+      "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"],
       "category": ["KOREANFOOD", "MEAT"],
-      "viewCount": 0,
-      "averageRating": 4.5,
-      "favoriteCount": 0,
-      "reservationCount": 0
+      "createdDate": "2024-01-01T12:00:00",
+      "updatedDate": "2024-01-01T12:00:00",
+      "viewCount": 150,
+      "averageRating": 4.5
     }
   ],
   "message": "View My Stores"
 }
 ```
 
-### 모든 가게 목록 조회 (Get All Stores)
-- **URL**: `/api/store/all`
+### 전체 가게 목록 조회 (Get All Stores)
+- **URL**: `/api/store/all?sortBy=rating`
 - **HTTP Method**: GET
-- **Query Parameters**:
-  - `sortBy` (optional): 정렬 기준
-    - `favorite`: 찜 추가한 인원 많은 순
-    - `rating`: 리뷰 평점 순
-    - `reservation`: 예약 수 많은 순
-    - 기본 순서: 쿼리 파라미터를 생략하거나 다른 값을 사용
+
+#### Request Parameters
+- **sortBy**: 정렬 기준 (optional)
+  - `favorite`: 즐겨찾기 수 기준
+  - `rating`: 별점 기준
+  - `reservation`: 예약 수 기준
 
 #### Response
 ```json
@@ -319,6 +411,7 @@
   "status": "success",
   "data": [
     {
+      "storePK": 1,
       "storeName": "맛있는 한식당",
       "location": "서울시 강남구",
       "description": "한식 전문점입니다.",
@@ -328,46 +421,42 @@
       "depositor": "김사장",
       "businessHours": {
         "월요일": "09:00 - 22:00",
-        "화요일": "09:00 - 22:00"
+        "화요일": "09:00 - 22:00",
+        "수요일": "09:00 - 22:00",
+        "목요일": "09:00 - 22:00",
+        "금요일": "09:00 - 22:00",
+        "토요일": "10:00 - 21:00",
+        "일요일": "10:00 - 20:00"
       },
-      "image": [
-        "https://example.com/image1.jpg",
-        "https://example.com/image2.jpg"
+      "regularHolidays": {
+        "월요일": 0,
+        "화요일": 0,
+        "수요일": 0,
+        "목요일": 0,
+        "금요일": 0,
+        "토요일": 0,
+        "일요일": 1
+      },
+      "temporaryHolidays": [
+        "2024-01-01",
+        "2024-02-09",
+        "2024-02-10"
       ],
+      "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"],
       "category": ["KOREANFOOD", "MEAT"],
-      "viewCount": 0,
+      "createdDate": "2024-01-01T12:00:00",
+      "updatedDate": "2024-01-01T12:00:00",
+      "viewCount": 150,
       "averageRating": 4.5,
-      "favoriteCount": 0,
-      "reservationCount": 0
-    },
-    {
-      "storeName": "다른 가게",
-      "location": "Busan",
-      "description": "다른 설명",
-      "businessRegistrationNumber": "987-65-43210",
-      "bank": "신한은행",
-      "accountNumber": "987654-32-109876",
-      "depositor": "박사장",
-      "businessHours": {
-        "월요일": "10:00 - 20:00",
-        "화요일": "10:00 - 20:00"
-      },
-      "image": [
-        "https://example.com/other_image1.jpg",
-        "https://example.com/other_image2.jpg"
-      ],
-      "category": ["RESTAURANT"],
-      "viewCount": 5,
-      "averageRating": 3.8,
-      "favoriteCount": 0,
-      "reservationCount": 0
+      "favoriteCount": 25,
+      "reservationCount": 12
     }
   ],
   "message": "View All Stores"
 }
 ```
 
-### 가게 ID로 가게 조회 (Get Store By ID)
+### 가게 상세 조회 (Get Store by ID)
 - **URL**: `/api/store/{storeId}`
 - **HTTP Method**: GET
 
@@ -376,6 +465,7 @@
 {
   "status": "success",
   "data": {
+    "storePK": 1,
     "storeName": "맛있는 한식당",
     "location": "서울시 강남구",
     "description": "한식 전문점입니다.",
@@ -385,33 +475,45 @@
     "depositor": "김사장",
     "businessHours": {
       "월요일": "09:00 - 22:00",
-      "화요일": "09:00 - 22:00"
+      "화요일": "09:00 - 22:00",
+      "수요일": "09:00 - 22:00",
+      "목요일": "09:00 - 22:00",
+      "금요일": "09:00 - 22:00",
+      "토요일": "10:00 - 21:00",
+      "일요일": "10:00 - 20:00"
     },
-    "image": [
-      "https://example.com/image1.jpg",
-      "https://example.com/image2.jpg"
+    "regularHolidays": {
+      "월요일": 0,
+      "화요일": 0,
+      "수요일": 0,
+      "목요일": 0,
+      "금요일": 0,
+      "토요일": 0,
+      "일요일": 1
+    },
+    "temporaryHolidays": [
+      "2024-01-01",
+      "2024-02-09",
+      "2024-02-10"
     ],
+    "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"],
     "category": ["KOREANFOOD", "MEAT"],
-    "viewCount": 10,
-    "averageRating": 4.5,
-    "favoriteCount": 0,
-    "reservationCount": 0,
-    "latitude": 37.5665,
-    "longitude": 126.9780
+    "createdDate": "2024-01-01T12:00:00",
+    "updatedDate": "2024-01-01T12:00:00",
+    "viewCount": 150,
+    "averageRating": 4.5
   },
   "message": "View Store By Id"
 }
 ```
 
-### 카테고리별 가게 조회 (Get Stores By Category)
-- **URL**: `/api/store/all/category/{category}`
+### 카테고리별 가게 조회 (Get Stores by Category)
+- **URL**: `/api/store/category/{category}?sortBy=rating`
 - **HTTP Method**: GET
-- **Query Parameters**:
-  - `sortBy` (optional): 정렬 기준
-    - `favorite`: 찜 추가한 인원 많은 순
-    - `rating`: 리뷰 평점 순
-    - `reservation`: 예약 수 많은 순
-    - 기본 순서: 쿼리 파라미터를 생략하거나 다른 값을 사용
+
+#### Request Parameters
+- **category**: 카테고리 (String, 필수)
+- **sortBy**: 정렬 기준 (optional)
 
 #### Response
 ```json
@@ -419,6 +521,7 @@
   "status": "success",
   "data": [
     {
+      "storePK": 1,
       "storeName": "맛있는 한식당",
       "location": "서울시 강남구",
       "description": "한식 전문점입니다.",
@@ -428,17 +531,35 @@
       "depositor": "김사장",
       "businessHours": {
         "월요일": "09:00 - 22:00",
-        "화요일": "09:00 - 22:00"
+        "화요일": "09:00 - 22:00",
+        "수요일": "09:00 - 22:00",
+        "목요일": "09:00 - 22:00",
+        "금요일": "09:00 - 22:00",
+        "토요일": "10:00 - 21:00",
+        "일요일": "10:00 - 20:00"
       },
-      "image": [
-        "https://example.com/image1.jpg",
-        "https://example.com/image2.jpg"
+      "regularHolidays": {
+        "월요일": 0,
+        "화요일": 0,
+        "수요일": 0,
+        "목요일": 0,
+        "금요일": 0,
+        "토요일": 0,
+        "일요일": 1
+      },
+      "temporaryHolidays": [
+        "2024-01-01",
+        "2024-02-09",
+        "2024-02-10"
       ],
+      "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"],
       "category": ["KOREANFOOD", "MEAT"],
-      "viewCount": 0,
+      "createdDate": "2024-01-01T12:00:00",
+      "updatedDate": "2024-01-01T12:00:00",
+      "viewCount": 150,
       "averageRating": 4.5,
-      "favoriteCount": 10,
-      "reservationCount": 0
+      "favoriteCount": 25,
+      "reservationCount": 12
     }
   ],
   "message": "View Stores By Category"
@@ -469,9 +590,28 @@
       "category": ["KOREANFOOD", "MEAT"],
       "businessHours": {
         "월요일": "09:00 - 22:00",
-        "화요일": "09:00 - 22:00"
+        "화요일": "09:00 - 22:00",
+        "수요일": "09:00 - 22:00",
+        "목요일": "09:00 - 22:00",
+        "금요일": "09:00 - 22:00",
+        "토요일": "10:00 - 21:00",
+        "일요일": "10:00 - 20:00"
       },
-      "image": ["store/image1.png", "store/image2.png"],
+      "regularHolidays": {
+        "월요일": 0,
+        "화요일": 0,
+        "수요일": 0,
+        "목요일": 0,
+        "금요일": 0,
+        "토요일": 0,
+        "일요일": 1
+      },
+      "temporaryHolidays": [
+        "2024-01-01",
+        "2024-02-09",
+        "2024-02-10"
+      ],
+      "image": ["store/1/abc123_store_1.png", "store/1/def456_store_2.png"],
       "viewCount": 100,
       "averageRating": 4.5,
       "favoriteCount": 20,

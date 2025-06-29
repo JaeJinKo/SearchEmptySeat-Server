@@ -21,6 +21,8 @@ public class StoreResponse {
     private String accountNumber;
     private String depositor;
     private Map<String, String> businessHours;
+    private Map<String, Integer> regularHolidays;
+    private List<String> temporaryHolidays;
     private List<String> image;
     private List<StoreCategory> category;
     private LocalDateTime createdDate;
@@ -40,6 +42,8 @@ public class StoreResponse {
         this.accountNumber = store.getAccountNumber();
         this.depositor = store.getDepositor();
         this.businessHours = store.getBusinessHours();
+        this.regularHolidays = store.getRegularHolidays();
+        this.temporaryHolidays = store.getTemporaryHolidays();
         this.image = store.getImage();
         this.category = store.getCategory();
         this.createdDate = store.getCreatedDate();
@@ -56,6 +60,8 @@ public class StoreResponse {
         this.accountNumber = store.getAccountNumber();
         this.depositor = store.getDepositor();
         this.businessHours = store.getBusinessHours();
+        this.regularHolidays = store.getRegularHolidays();
+        this.temporaryHolidays = store.getTemporaryHolidays();
         this.image = store.getImage();
         this.category = store.getCategory();
         this.createdDate = store.getCreatedDate();
@@ -72,10 +78,13 @@ public class StoreResponse {
         this.accountNumber = store.getAccountNumber();
         this.depositor = store.getDepositor();
         this.businessHours = store.getBusinessHours();
+        this.regularHolidays = store.getRegularHolidays();
+        this.temporaryHolidays = store.getTemporaryHolidays();
         this.image = store.getImage();
         this.category = store.getCategory();
         this.createdDate = store.getCreatedDate();
         this.updatedDate = store.getUpdatedDate();
+        this.viewCount = viewCount;
     }
 
     public StoreResponse(Store store, ObjectMapper objectMapper, int viewCount, double averageRating) {
