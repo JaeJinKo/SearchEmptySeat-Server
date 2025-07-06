@@ -65,14 +65,19 @@ public class PlacementService {
         Map<String, Object> layout = placement.getLayout();
         Map<String, Object> updateLayout = convertTableLayoutDataToMap(request.getLayout());
         
-        // 각 테이블의 상태만 업데이트
+        // 각 테이블 업데이트 (기존 테이블 수정 + 새로운 테이블 추가)
         for (Map.Entry<String, Object> entry : updateLayout.entrySet()) {
             String tableNumber = entry.getKey();
+            Map<String, Object> updateInfo = (Map<String, Object>) entry.getValue();
+            
             if (layout.containsKey(tableNumber)) {
+                // 기존 테이블인 경우: 상태만 업데이트
                 Map<String, Object> tableInfo = (Map<String, Object>) layout.get(tableNumber);
-                Map<String, Object> updateInfo = (Map<String, Object>) entry.getValue();
                 tableInfo.put("status", updateInfo.get("status"));
                 layout.put(tableNumber, tableInfo);
+            } else {
+                // 새로운 테이블인 경우: 전체 정보 추가
+                layout.put(tableNumber, updateInfo);
             }
         }
 
