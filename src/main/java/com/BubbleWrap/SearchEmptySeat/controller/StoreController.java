@@ -120,4 +120,9 @@ public class StoreController {
         Map<String, Object> data = storeService.getReservationStats(storeId);
         return ResponseEntity.ok(ApiResponse.success(data, "Reservation statistics retrieved successfully"));
     }
+
+    @GetMapping("/{storeId}/today-stats")
+    public ResponseEntity<ApiResponse<com.BubbleWrap.SearchEmptySeat.dto.store.TodayStatsResponse>> getTodayStats(@PathVariable Long storeId) {
+        return storeService.getTodayStats(storeId);
+    }
 }

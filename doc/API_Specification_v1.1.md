@@ -625,29 +625,91 @@
 ### 가게 예약 통계 조회 (Get Store Reservation Statistics)
 - **URL**: `/api/store/{storeId}/reservations/stats`
 - **HTTP Method**: GET
+- **설명**: 가게의 예약 현황 통계를 조회합니다. 현재 시간에서 30일 전까지의 데이터를 기반으로 요일별 평균 예약 수를 계산합니다.
 
 #### Response
 ```json
 {
   "status": "success",
   "data": {
-    "currentReservations": 0,
+    "currentReservations": 5,
     "estimatedWaitTime": 1,
-    "weeklyStats": [
+    "monthlyStats": [
       {
         "day": "월",
-        "averageTeams": 0
+        "averageTeams": 3.2
       },
       {
         "day": "화",
-        "averageTeams": 0
+        "averageTeams": 4.5
+      },
+      {
+        "day": "수",
+        "averageTeams": 2.8
+      },
+      {
+        "day": "목",
+        "averageTeams": 5.1
+      },
+      {
+        "day": "금",
+        "averageTeams": 6.7
+      },
+      {
+        "day": "토",
+        "averageTeams": 8.3
+      },
+      {
+        "day": "일",
+        "averageTeams": 7.9
       }
-      // ... 다른 요일 데이터
     ]
   },
   "message": "Reservation statistics retrieved successfully"
 }
 ```
+
+#### 데이터 설명
+- **currentReservations**: 오늘의 예약 수
+- **estimatedWaitTime**: 예상 대기 시간 (분 단위, 현재 1분으로 고정)
+- **monthlyStats**: 요일별 평균 예약 수 (30일 데이터 기반)
+  - **day**: 요일 (월~일)
+  - **averageTeams**: 해당 요일의 평균 예약 수 (소수점 첫째자리까지)
+
+#### 계산 방식
+1. 현재 시간에서 30일 전까지의 예약 데이터를 조회
+2. 각 요일별로 예약 수를 합산
+3. 해당 요일이 나타난 주차 수로 나누어 평균 계산
+4. 소수점 첫째자리까지 반올림하여 반환
+
+### 오늘 현황 조회 (Get Today's Store Stats)
+- **URL**: `/api/store/{storeId}/today-stats`
+- **HTTP Method**: GET
+- **설명**: 오늘 날짜 기준으로 현재 시간, 오늘 총 매출, 예약 건수, 예약 취소 건수, 평균 예약 금액, 최고 예약 금액을 반환합니다.
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "currentTime": "2024-06-25T15:30:00",
+    "totalRevenue": 120000,
+    "totalReservations": 8,
+    "cancelledReservations": 0,
+    "averageReservationAmount": 15000.0,
+    "highestReservationAmount": 30000
+  },
+  "message": "오늘 현황을 조회했습니다."
+}
+```
+
+#### 데이터 설명
+- **currentTime**: 현재 시간 (ISO-8601 포맷)
+- **totalRevenue**: 오늘 총 매출 (원)
+- **totalReservations**: 오늘 예약 건수
+- **cancelledReservations**: 오늘 예약 취소 건수(현재 0, 추후 예약 상태 관리 시 변경 가능)
+- **averageReservationAmount**: 오늘 평균 예약 금액 (소수점 첫째자리까지)
+- **highestReservationAmount**: 오늘 최고 예약 금액 (원)
 
 ## 메뉴 (Menu)
 

@@ -16,6 +16,7 @@ import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.store.StoreRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.store.StoreResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.store.TodayStatsResponse;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
 import com.BubbleWrap.SearchEmptySeat.model.Review;
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
 
 @Service
 @RequiredArgsConstructor
@@ -305,29 +307,50 @@ public class StoreService {
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
         LocalDateTime todayEnd = todayStart.plusDays(1);
 
-        // 요일별 예약 건수 계산
-        List<Map<String, Object>> weeklyStats = new ArrayList<>();
+        // 요일별 예약 건수 계산 (한달 평균)
+        List<Map<String, Object>> monthlyStats = new ArrayList<>();
         String[] days = {"월", "화", "수", "목", "금", "토", "일"};
         Map<String, Integer> dayCounts = new HashMap<>();
+        Map<String, Integer> dayWeeks = new HashMap<>(); // 각 요일별 주차 수를 세기 위한 맵
+        
         for (String day : days) {
             dayCounts.put(day, 0);
+            dayWeeks.put(day, 0);
         }
 
-        // 주간 예약을 가져오기 위해 시작일과 종료일 설정
-        LocalDateTime weekStart = todayStart.minusDays(todayStart.getDayOfWeek().getValue() - 1);
-        LocalDateTime weekEnd = weekStart.plusDays(7);
+        // 한달(30일) 전부터 오늘까지의 예약을 가져오기
+        LocalDateTime monthStart = todayStart.minusDays(30);
+        LocalDateTime monthEnd = todayEnd;
 
-        List<Reservation> reservations = reservationRepository.findByStorePKAndReservationTimeBetween(storeId, weekStart, weekEnd);
+        List<Reservation> reservations = reservationRepository.findByStorePKAndReservationTimeBetween(storeId, monthStart, monthEnd);
+        
+        // 각 요일별로 예약 수를 세고, 해당 요일이 몇 주차에 나타났는지도 세기
         for (Reservation reservation : reservations) {
             String dayOfWeek = reservation.getReservationTime().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
             dayCounts.put(dayOfWeek, dayCounts.get(dayOfWeek) + 1);
+            
+            // 해당 요일이 몇 주차에 나타났는지 계산 (30일 동안 최대 5주차까지 가능)
+            int weekOfYear = reservation.getReservationTime().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+            String weekKey = dayOfWeek + "_" + weekOfYear;
+            if (!dayWeeks.containsKey(weekKey)) {
+                dayWeeks.put(dayOfWeek, dayWeeks.get(dayOfWeek) + 1);
+            }
         }
 
+        // 각 요일별 평균 예약 수 계산
         for (String day : days) {
             Map<String, Object> stats = new HashMap<>();
             stats.put("day", day);
-            stats.put("averageTeams", dayCounts.get(day));
-            weeklyStats.add(stats);
+            
+            int totalCount = dayCounts.get(day);
+            int weekCount = dayWeeks.get(day);
+            
+            // 해당 요일이 나타난 주차 수로 나누어 평균 계산
+            // 최소 1주차는 있다고 가정 (0으로 나누기 방지)
+            double averageTeams = weekCount > 0 ? (double) totalCount / weekCount : 0.0;
+            stats.put("averageTeams", Math.round(averageTeams * 10.0) / 10.0); // 소수점 첫째자리까지 반올림
+            
+            monthlyStats.add(stats);
         }
 
         // 오늘 예약 수로 설정
@@ -335,7 +358,75 @@ public class StoreService {
         data.put("currentReservations", (int) currentReservations);
 
         data.put("estimatedWaitTime", 1);
-        data.put("weeklyStats", weeklyStats);
+        data.put("monthlyStats", monthlyStats); // weeklyStats에서 monthlyStats로 변경
         return data;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<TodayStatsResponse>> getTodayStats(Long storeId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEnd = todayStart.plusDays(1);
+
+        // 오늘의 모든 예약 조회
+        List<Reservation> todayReservations = reservationRepository.findByStorePKAndReservationTimeBetween(storeId, todayStart, todayEnd);
+        
+        // 오늘의 취소된 예약 조회 (삭제된 예약은 별도 테이블이 없으므로 createdDate 기준으로 오늘 생성된 것 중 삭제된 것)
+        // 실제로는 예약 상태가 'cancelled'인 것들을 조회해야 하지만, 현재 모델에는 삭제만 있으므로
+        // 실제 취소 건수는 0으로 설정 (추후 예약 상태 관리 개선 시 수정 필요)
+        int cancelledReservations = 0;
+
+        // 매출 계산
+        long totalRevenue = 0;
+        long highestReservationAmount = 0;
+        List<Long> reservationAmounts = new ArrayList<>();
+
+        for (Reservation reservation : todayReservations) {
+            long reservationAmount = calculateReservationAmount(reservation);
+            totalRevenue += reservationAmount;
+            reservationAmounts.add(reservationAmount);
+            
+            if (reservationAmount > highestReservationAmount) {
+                highestReservationAmount = reservationAmount;
+            }
+        }
+
+        // 평균 예약 금액 계산
+        double averageReservationAmount = reservationAmounts.isEmpty() ? 0.0 : 
+            (double) totalRevenue / reservationAmounts.size();
+
+        TodayStatsResponse todayStats = new TodayStatsResponse(
+            now,
+            totalRevenue,
+            todayReservations.size(),
+            cancelledReservations,
+            Math.round(averageReservationAmount * 10.0) / 10.0, // 소수점 첫째자리까지 반올림
+            highestReservationAmount
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(todayStats, "View Today Stats"));
+    }
+
+    /**
+     * 예약의 총 금액을 계산하는 헬퍼 메서드
+     */
+    private long calculateReservationAmount(Reservation reservation) {
+        long totalAmount = 0;
+        Map<String, Object> menu = reservation.getMenu();
+        
+        if (menu != null) {
+            for (Map.Entry<String, Object> entry : menu.entrySet()) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> menuItem = (Map<String, Object>) entry.getValue();
+                
+                if (menuItem.containsKey("price") && menuItem.containsKey("quantity")) {
+                    long price = ((Number) menuItem.get("price")).longValue();
+                    int quantity = ((Number) menuItem.get("quantity")).intValue();
+                    totalAmount += price * quantity;
+                }
+            }
+        }
+        
+        return totalAmount;
     }
 }
