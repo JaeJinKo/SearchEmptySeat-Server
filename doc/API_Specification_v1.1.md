@@ -1190,16 +1190,28 @@
 
 ## 예약 (Reservation)
 
+### 예약 상태 (Reservation Status)
+- **pending**: 대기 중 (예약 생성 시 기본값)
+- **cancelled**: 취소됨 (사용자가 취소한 예약)
+- **completed**: 완료됨 (예약 시간이 1시간 지난 예약)
+
 ### 예약 생성 (Create Reservation)
 - **URL**: `/api/reservations/create`
 - **HTTP Method**: POST
 
+#### 예약 번호 생성 규칙
+- **가게별 독립**: 각 가게마다 별도의 예약 번호 체계
+- **일일 리셋**: 매일 00시(자정)에 예약 번호가 1번으로 리셋
+- **순차 증가**: 같은 가게에서 같은 날 생성된 예약은 1, 2, 3... 순서로 증가
+- **예시**: 
+  - A가게 2024-03-25: 1번, 2번, 3번 예약
+  - A가게 2024-03-26: 1번, 2번 예약 (다시 1부터 시작)
+  - B가게 2024-03-25: 1번, 2번 예약 (A가게와 독립적)
+
 #### Request Body
 ```json
 {
-    "userId": 1,
     "storePK": 1,
-    "reservationNum": 1,
     "reservationTime": "2024-03-25T18:00:00",
     "menu": {
         "1": {
@@ -1215,10 +1227,14 @@
     },
     "tableNumber": 5,
     "partySize": 3,
-    "paymentMethod": "offline",  // "point","offline"
-    "status": "pending"      // "pending", "confirmed", "cancelled"
+    "paymentMethod": "offline"  // "point","offline"
 }
 ```
+
+#### 설명
+- `userId`는 JWT 토큰에서 자동으로 추출됨
+- `reservationNum`은 서버에서 자동으로 생성됨 (가게별로 매일 1부터 시작)
+- `status`는 자동으로 "pending"으로 설정됨
 
 #### Response
 ```json
@@ -1245,7 +1261,7 @@
         "tableNumber": 5,
         "partySize": 3,
         "paymentMethod": "point",
-        "status": "confirmed",
+        "status": "pending",
         "createdDate": "2024-03-25T17:00:00",
         "endDate": "2024-03-25T19:00:00"
     },
@@ -1257,11 +1273,44 @@
 - **URL**: `/api/reservations/cancel/{reservationId}`
 - **HTTP Method**: DELETE
 
+#### 설명
+- 예약을 삭제하지 않고 status를 "cancelled"로 변경
+- 예약 시간 30분 전까지만 취소 가능
+- 이미 취소된 예약은 다시 취소할 수 없음
+
 #### Response
 ```json
 {
     "status": "success",
     "message": "Reservation cancelled successfully"
+}
+```
+
+#### Error Response
+```json
+{
+    "status": "error",
+    "code": "RESERVATION_ALREADY_CANCELLED",
+    "message": "이미 취소된 예약입니다."
+}
+```
+
+
+### 만료된 예약 완료 처리 (Complete Expired Reservations)
+- **URL**: `/api/reservations/complete-expired`
+- **HTTP Method**: POST
+
+#### 설명
+- 예약 시간이 1시간 지난 pending 예약들을 completed로 변경
+- **서버에서 매시간 자동으로 실행됨** (스케줄러)
+- 수동으로도 호출 가능 (테스트용)
+
+#### Response
+```json
+{
+    "status": "success",
+    "data": "Expired reservations completed: 3",
+    "message": "success"
 }
 ```
 
@@ -1300,8 +1349,12 @@
 ```
 
 ### 사용자별 예약 목록 조회 (Get User Reservations)
-- **URL**: `/api/reservations/user/{userId}`
+- **URL**: `/api/reservations/user`
 - **HTTP Method**: GET
+
+#### 설명
+- 현재 로그인한 사용자의 예약 목록을 조회
+- JWT 토큰에서 사용자 정보를 자동으로 추출
 
 #### Response
 ```json
@@ -1375,21 +1428,23 @@
 ## 리뷰 (Review)
 
 ### 리뷰 생성 (Create Review)
-- **URL**: `/api/review`
+- **URL**: `/api/review/add`
 - **HTTP Method**: POST
+- **Content-Type**: `multipart/form-data`
+
+#### 설명
+- JWT 토큰에서 사용자 정보를 자동으로 추출
+- 이미지는 선택사항이며, 최대 5개까지 업로드 가능
+- rating은 0~10 범위로 저장되며, 응답에서는 0~5로 변환되어 반환
 
 #### Request Body
-```json
-{
-  "userPK": 1,
+```form-data
+data: {
   "storePK": 1,
-  "image": [
-    "https://example.com/review_image1.jpg",
-    "https://example.com/review_image2.jpg"
-  ],
-  "rating": 4.5,
+  "rating": 8,  // 0~10 범위
   "content": "맛있어요!"
 }
+images: [파일1, 파일2, ...]  // 선택사항, 최대 5개
 ```
 
 #### Response
@@ -1398,23 +1453,26 @@
   "status": "success",
   "data": {
     "reviewId": 1,
-    "userPK": 1,
-    "storePK": 1,
-    "image": [
-      "https://example.com/review_image1.jpg",
-      "https://example.com/review_image2.jpg"
-    ],
-    "rating": 4.5,
+    "storeId": 1,
+    "user": "사용자명",
+    "rating": 4.0,  // 0~5 범위로 변환
     "content": "맛있어요!",
-    "createdDate": "2023-10-01T12:00:00"
+    "image": [
+      "store/1/review/uuid1_review.jpg",
+      "store/1/review/uuid2_review.png"
+    ]
   },
-  "message": "Review created"
+  "message": "Review submitted"
 }
 ```
 
-### 모든 리뷰 조회 (Get All Reviews)
-- **URL**: `/api/review`
+### 가게별 리뷰 조회 (Get Reviews by Store)
+- **URL**: `/api/review/store/{storePK}`
 - **HTTP Method**: GET
+
+#### 설명
+- 특정 가게의 모든 리뷰를 생성일 기준 내림차순으로 조회
+- rating은 0~5 범위로 반환 (DB에는 0~10으로 저장)
 
 #### Response
 ```json
@@ -1422,19 +1480,18 @@
   "status": "success",
   "data": [
     {
-      "reviewId": 1,
-      "userPK": 1,
-      "storePK": 1,
-      "image": [
-        "https://example.com/review_image1.jpg",
-        "https://example.com/review_image2.jpg"
-      ],
-      "rating": 4.5,
+      "reviewPK": 1,
+      "userName": "사용자명",
+      "rating": 4.0,  // 0~5 범위
       "content": "맛있어요!",
-      "createdDate": "2023-10-01T12:00:00"
+      "image": [
+        "store/1/review/uuid1_review.jpg",
+        "store/1/review/uuid2_review.png"
+      ],
+      "createdDate": "2024-03-25T17:00:00"
     }
   ],
-  "message": "All reviews"
+  "message": "Reviews fetched"
 }
 ```
 
@@ -1451,7 +1508,7 @@
 - **멤버 프로필**: `/api/files/member/profile/{uuid}_profile.{ext}`
 - **매장 이미지**: `/api/files/store/{storeId}/{uuid}_store.{ext}`
 - **메뉴 이미지**: `/api/files/store/{storeId}/menu/{uuid}_menu.{ext}`
-- **리뷰 이미지**: `/api/files/review/{reviewId}/{uuid}_review.{ext}`
+- **리뷰 이미지**: `/api/files/store/{storeId}/review/{uuid}_review.{ext}`
 
 #### 지원하는 파일 형식
 - **확장자**: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`

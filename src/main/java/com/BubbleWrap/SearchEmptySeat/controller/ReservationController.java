@@ -34,13 +34,22 @@ public class ReservationController {
         return reservationService.getOwnerReservations(storeId);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<ReservationResponse>>> getUserReservations(@PathVariable Long userId) {
-        return reservationService.getUserReservations(userId);
+    @GetMapping("/user")
+    public ResponseEntity<ApiResponse<List<ReservationResponse>>> getUserReservations() {
+        return reservationService.getUserReservations();
     }
 
     @GetMapping("/details/{reservationId}")
     public ResponseEntity<ApiResponse<ReservationResponse>> getReservationDetails(@PathVariable Long reservationId) {
         return reservationService.getReservationDetails(reservationId);
     }
+
+
+
+    @PostMapping("/complete-expired")
+    public ResponseEntity<ApiResponse<String>> completeExpiredReservations() {
+        return reservationService.completeExpiredReservations();
+    }
+
+
 }

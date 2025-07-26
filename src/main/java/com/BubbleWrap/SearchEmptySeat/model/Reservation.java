@@ -58,4 +58,16 @@ public class Reservation {
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
+    
+    // 예약 시간으로부터 1시간 후를 endDate로 설정
+    public void setEndDateFromReservationTime() {
+        if (this.reservationTime != null) {
+            this.endDate = this.reservationTime.plusHours(1);
+        }
+    }
+    
+    // 예약이 완료되었는지 확인 (현재 시간이 endDate를 지났는지)
+    public boolean isCompleted() {
+        return this.endDate != null && LocalDateTime.now().isAfter(this.endDate);
+    }
 }
