@@ -711,6 +711,66 @@
 - **averageReservationAmount**: 오늘 평균 예약 금액 (소수점 첫째자리까지)
 - **highestReservationAmount**: 오늘 최고 예약 금액 (원)
 
+### 지도 핀 목록 조회 (Get Map Pins)
+- **URL**: `/api/map/pins`
+- **HTTP Method**: GET
+- **설명**: 모바일 지도에서 가게 핀을 표시하기 위한 기본 정보를 조회합니다.
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "storePK": 1,
+      "location": "서울시 강남구 테헤란로 123"
+    },
+    {
+      "storePK": 2,
+      "location": "서울시 마포구 홍대입구역 456"
+    },
+    {
+      "storePK": 3,
+      "location": "서울시 종로구 인사동 789"
+    }
+  ],
+  "message": "Map pins fetched"
+}
+```
+
+#### 데이터 설명
+- **storePK**: 가게 고유 식별자
+- **location**: 가게 주소
+
+### 지도 핀 디테일 조회 (Get Map Pin Detail)
+- **URL**: `/api/map/pin/{storePK}`
+- **HTTP Method**: GET
+- **설명**: 지도에서 핀을 클릭했을 때 표시할 상세 정보를 조회합니다.
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "storePK": 1,
+    "storeName": "맛있는 한식당",
+    "availableSeats": 12
+  },
+  "message": "Map pin detail fetched"
+}
+```
+
+#### 데이터 설명
+- **storePK**: 가게 고유 식별자
+- **storeName**: 가게 이름
+- **availableSeats**: 현재 빈자리 수 (Placement 레이아웃에서 status=0인 테이블들의 총 인원 수)
+
+#### 빈자리 수 계산 방식
+1. 해당 가게의 Placement 레이아웃 정보를 조회
+2. 각 테이블의 status가 0(빈자리)인 경우
+3. 해당 테이블의 table(최대 인원) 값을 합산
+4. 모든 빈 테이블의 최대 인원을 합한 값이 availableSeats
+
 ## 메뉴 (Menu)
 
 ### 메뉴 추가 (Add Menu)

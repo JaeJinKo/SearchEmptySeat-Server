@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/utils/**").permitAll()// 로그인, 회원가입은 모두 허용
+                        .requestMatchers("/api/map/**").hasAnyRole("USER", "OWNER")
                         .requestMatchers(
                                 "/api/store/register", "api/store/my",
                                 "api/menu/add", "/api/me/{userId}"

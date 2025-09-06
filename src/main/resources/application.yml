@@ -1,6 +1,10 @@
 spring:
   application:
     name: SearchEmptySeat
+  web:
+    resources:
+      static-locations: classpath:/static/
+      add-mappings: true
   datasource:
     url: jdbc:postgresql://localhost:5432/ses
     username: ses
