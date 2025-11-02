@@ -41,7 +41,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/store/all", "/api/store/{storeId}",
                                 "/api/store/category/{category}", "api/menu/store/{storePK}", "/api/files/**",
-                                "/api/reservations/complete-expired"
+                                "/api/reservations/complete-expired", "/api/review/store/{storePK}/stats",
+                                "/api/reservations/store/{storePK}/available-slots"
                         ).hasAnyRole("USER", "OWNER")
                         //.requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN") // 관리자만 접근 가능
                         //.requestMatchers("/api/owner/**").hasAnyRole("OWNER", "SUPER_ADMIN") // 점주와 관리자만 접근 가능

@@ -96,3 +96,4 @@ public class MapService {
         return availableSeats;
     }
 }
+

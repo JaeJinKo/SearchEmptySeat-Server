@@ -1485,6 +1485,105 @@
 4. 예약 시간은 현재 시간 이후여야 합니다.
 5. 예약 인원은 해당 테이블의 최대 인원을 초과할 수 없습니다.
 
+### 시간대별 예약 가능 좌석 조회 (Get Available Time Slots)
+- **URL**: `/api/reservations/store/{storePK}/available-slots?date={date}`
+- **HTTP Method**: GET
+
+#### 설명
+- 특정 날짜의 시간대별 예약 가능한 좌석 수를 1시간 단위로 조회
+- 가게의 영업시간에 따라 시간대가 자동으로 생성됨
+- 휴무일(정기/임시)은 오류 반환
+- 취소되지 않은 예약만 좌석 수에 반영됨
+
+#### Request Parameters
+- **storePK** (Path): 가게 ID
+- **date** (Query): 조회할 날짜 (형식: `YYYY-MM-DD`, 예: `2024-10-24`)
+
+#### Response
+```json
+{
+    "status": "success",
+    "data": {
+        "date": "2024-10-24",
+        "openTime": "11:00",
+        "closeTime": "22:00",
+        "timeSlots": [
+            {
+                "time": "11:00",
+                "availableSeats": 20
+            },
+            {
+                "time": "12:00",
+                "availableSeats": 15
+            },
+            {
+                "time": "13:00",
+                "availableSeats": 8
+            },
+            {
+                "time": "14:00",
+                "availableSeats": 10
+            },
+            {
+                "time": "15:00",
+                "availableSeats": 18
+            },
+            {
+                "time": "16:00",
+                "availableSeats": 20
+            },
+            {
+                "time": "17:00",
+                "availableSeats": 12
+            },
+            {
+                "time": "18:00",
+                "availableSeats": 5
+            },
+            {
+                "time": "19:00",
+                "availableSeats": 3
+            },
+            {
+                "time": "20:00",
+                "availableSeats": 7
+            },
+            {
+                "time": "21:00",
+                "availableSeats": 16
+            }
+        ]
+    },
+    "message": "Available time slots fetched"
+}
+```
+
+#### Error Response (휴무일)
+```json
+{
+    "status": "error",
+    "code": "ERROR-0213",
+    "message": "해당 날짜는 휴무일입니다."
+}
+```
+
+#### Error Response (영업시간 미설정)
+```json
+{
+    "status": "error",
+    "code": "ERROR-0214",
+    "message": "영업시간이 설정되지 않았습니다."
+}
+```
+
+#### 로직 설명
+1. **총 좌석 수 계산**: 자리 배치(Placement) 정보에서 모든 테이블의 최대 인원을 합산
+2. **예약된 좌석 수 계산**: 각 시간대(1시간 단위)에 해당하는 예약의 `partySize` 합산
+3. **가용 좌석 수**: `총 좌석 수 - 예약된 좌석 수` (최소 0)
+4. **휴무일 체크**: 
+   - 정기 휴무일: `regularHolidays`에서 요일별 확인
+   - 임시 휴무일: `temporaryHolidays` 리스트에 날짜 포함 여부 확인
+
 ## 리뷰 (Review)
 
 ### 리뷰 생성 (Create Review)
@@ -1554,6 +1653,41 @@ images: [파일1, 파일2, ...]  // 선택사항, 최대 5개
   "message": "Reviews fetched"
 }
 ```
+
+### 가게별 리뷰 통계 조회 (Get Review Statistics by Store)
+- **URL**: `/api/review/store/{storePK}/stats`
+- **HTTP Method**: GET
+
+#### 설명
+- 특정 가게의 리뷰 통계를 조회
+- 총 리뷰 수, 평균 평점, 각 평점별(1~5점) 리뷰 개수를 반환
+- rating은 0~5 범위로 반환 (DB에는 0~10으로 저장)
+
+#### Response
+```json
+{
+  "status": "success",
+  "data": {
+    "totalReviews": 42,
+    "averageRating": 4.2,
+    "rating1Count": 2,
+    "rating2Count": 3,
+    "rating3Count": 8,
+    "rating4Count": 15,
+    "rating5Count": 14
+  },
+  "message": "Review statistics fetched"
+}
+```
+
+#### 데이터 설명
+- **totalReviews**: 해당 가게의 총 리뷰 수
+- **averageRating**: 평균 평점 (0.0 ~ 5.0, 소수점 첫째자리까지)
+- **rating1Count**: 1점(0.0~1.0) 리뷰 개수
+- **rating2Count**: 2점(1.5~2.0) 리뷰 개수
+- **rating3Count**: 3점(2.5~3.0) 리뷰 개수
+- **rating4Count**: 4점(3.5~4.0) 리뷰 개수
+- **rating5Count**: 5점(4.5~5.0) 리뷰 개수
 
 ## 파일 서빙 (File Serving)
 

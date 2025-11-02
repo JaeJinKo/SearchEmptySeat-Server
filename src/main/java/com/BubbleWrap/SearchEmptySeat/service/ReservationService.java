@@ -2,29 +2,49 @@ package com.BubbleWrap.SearchEmptySeat.service;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
+import com.BubbleWrap.SearchEmptySeat.dto.reservation.AvailableTimeSlotsResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.reservation.ReservationRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.reservation.ReservationResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.reservation.TimeSlotResponse;
+import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
+import com.BubbleWrap.SearchEmptySeat.model.Placement;
 import com.BubbleWrap.SearchEmptySeat.model.Reservation;
+import com.BubbleWrap.SearchEmptySeat.model.Store;
 import com.BubbleWrap.SearchEmptySeat.repository.MemberRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.PlacementRepository;
 import com.BubbleWrap.SearchEmptySeat.repository.ReservationRepository;
+import com.BubbleWrap.SearchEmptySeat.repository.StoreRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
+    private final StoreRepository storeRepository;
+    private final PlacementRepository placementRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, MemberRepository memberRepository) {
+    public ReservationService(ReservationRepository reservationRepository, MemberRepository memberRepository, 
+                            StoreRepository storeRepository, PlacementRepository placementRepository) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
+        this.storeRepository = storeRepository;
+        this.placementRepository = placementRepository;
     }
 
     @Transactional
@@ -138,6 +158,119 @@ public class ReservationService {
         }
 
         return ResponseEntity.ok(ApiResponse.success("Expired reservations completed: " + expiredReservations.size()));
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<AvailableTimeSlotsResponse>> getAvailableTimeSlots(Long storePK, String date) {
+        // 가게 정보 조회
+        Store store = storeRepository.findById(storePK)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        // 자리 배치 정보 조회
+        Placement placement = placementRepository.findByStorePK(storePK)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACEMENT_NOT_FOUND));
+
+        // 날짜 파싱
+        LocalDate requestDate = LocalDate.parse(date);
+        
+        // 요일 확인
+        DayOfWeek dayOfWeek = requestDate.getDayOfWeek();
+        String dayName = getDayNameInKorean(dayOfWeek);
+
+        // 임시 휴무일 확인
+        if (store.getTemporaryHolidays() != null && store.getTemporaryHolidays().contains(date)) {
+            throw new BusinessException(ErrorCode.STORE_CLOSED);
+        }
+
+        // 정기 휴무일 확인
+        Map<String, Integer> regularHolidays = store.getRegularHolidays();
+        if (regularHolidays != null && regularHolidays.containsKey(dayName) && regularHolidays.get(dayName) == 1) {
+            throw new BusinessException(ErrorCode.STORE_CLOSED);
+        }
+
+        // 영업 시간 가져오기
+        Map<String, String> businessHours = store.getBusinessHours();
+        if (businessHours == null || !businessHours.containsKey(dayName)) {
+            throw new BusinessException(ErrorCode.BUSINESS_HOURS_NOT_SET);
+        }
+
+        String[] hours = businessHours.get(dayName).split("-");
+        String openTime = hours[0].trim();
+        String closeTime = hours[1].trim();
+
+        // 총 좌석 수 계산
+        int totalSeats = calculateTotalSeats(placement.getLayout());
+
+        // 시간대별 가용 좌석 계산
+        List<TimeSlotResponse> timeSlots = new ArrayList<>();
+        LocalTime start = LocalTime.parse(openTime, DateTimeFormatter.ofPattern("HH:mm"));
+        LocalTime end = LocalTime.parse(closeTime, DateTimeFormatter.ofPattern("HH:mm"));
+
+        while (start.isBefore(end)) {
+            LocalDateTime slotDateTime = LocalDateTime.of(requestDate, start);
+            
+            // 해당 시간대에 예약된 좌석 수 계산 (예약 시간 ~ 예약 시간 + 1시간 범위)
+            LocalDateTime slotEndTime = slotDateTime.plusHours(1);
+            List<Reservation> reservations = reservationRepository.findByStorePKAndReservationTimeBetween(
+                storePK, slotDateTime, slotEndTime
+            );
+
+            // 취소되지 않은 예약만 카운트
+            int reservedSeats = reservations.stream()
+                    .filter(r -> !"cancelled".equals(r.getStatus()))
+                    .mapToInt(Reservation::getPartySize)
+                    .sum();
+
+            int availableSeats = Math.max(0, totalSeats - reservedSeats);
+
+            timeSlots.add(new TimeSlotResponse(
+                start.format(DateTimeFormatter.ofPattern("HH:mm")),
+                availableSeats
+            ));
+
+            start = start.plusHours(1);
+        }
+
+        AvailableTimeSlotsResponse response = new AvailableTimeSlotsResponse(
+            date,
+            openTime,
+            closeTime,
+            timeSlots
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(response, "Available time slots fetched"));
+    }
+
+    private int calculateTotalSeats(Map<String, Object> layout) {
+        if (layout == null || layout.isEmpty()) {
+            return 0;
+        }
+
+        int totalSeats = 0;
+        for (Map.Entry<String, Object> entry : layout.entrySet()) {
+            if (entry.getValue() instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> tableInfo = (Map<String, Object>) entry.getValue();
+                Object tableCapacity = tableInfo.get("table");
+                if (tableCapacity instanceof Number) {
+                    totalSeats += ((Number) tableCapacity).intValue();
+                }
+            }
+        }
+        return totalSeats;
+    }
+
+    private String getDayNameInKorean(DayOfWeek dayOfWeek) {
+        switch (dayOfWeek) {
+            case MONDAY: return "월요일";
+            case TUESDAY: return "화요일";
+            case WEDNESDAY: return "수요일";
+            case THURSDAY: return "목요일";
+            case FRIDAY: return "금요일";
+            case SATURDAY: return "토요일";
+            case SUNDAY: return "일요일";
+            default: return "";
+        }
     }
 
 

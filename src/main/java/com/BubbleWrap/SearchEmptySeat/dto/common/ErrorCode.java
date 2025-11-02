@@ -37,6 +37,8 @@ public enum ErrorCode {
     STORE_VIEWS_NOT_FOUND("ERROR-0207", "The store view information could not be verified."),
     FAILED_CANCEL_RESERVATION("ERROR-0208", "Cannot cancel reservation within 30 minutes of the reservation time"),
     PLACEMENT_NOT_FOUND("ERROR-0209", "자리 배치 정보를 찾을 수 없습니다."),
+    STORE_CLOSED("ERROR-0213", "해당 날짜는 휴무일입니다."),
+    BUSINESS_HOURS_NOT_SET("ERROR-0214", "영업시간이 설정되지 않았습니다."),
     // ERROR-0300
 
     NOT_PUOND("ERROR-9999", "test")

@@ -16,6 +16,7 @@ import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.review.ReviewRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.review.ReviewResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.review.ReviewStatsResponse;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.service.ReviewService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,5 +49,10 @@ public class ReviewController {
     @GetMapping("/store/{storePK}")
     public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviews(@PathVariable Long storePK) {
         return reviewService.getReviewsByStore(storePK);
+    }
+
+    @GetMapping("/store/{storePK}/stats")
+    public ResponseEntity<ApiResponse<ReviewStatsResponse>> getReviewStats(@PathVariable Long storePK) {
+        return reviewService.getReviewStats(storePK);
     }
 }

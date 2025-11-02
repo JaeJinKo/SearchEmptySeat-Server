@@ -1,6 +1,7 @@
 package com.BubbleWrap.SearchEmptySeat.controller;
 
 import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.reservation.AvailableTimeSlotsResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.reservation.ReservationRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.reservation.ReservationResponse;
 import com.BubbleWrap.SearchEmptySeat.service.ReservationService;
@@ -49,6 +50,13 @@ public class ReservationController {
     @PostMapping("/complete-expired")
     public ResponseEntity<ApiResponse<String>> completeExpiredReservations() {
         return reservationService.completeExpiredReservations();
+    }
+
+    @GetMapping("/store/{storePK}/available-slots")
+    public ResponseEntity<ApiResponse<AvailableTimeSlotsResponse>> getAvailableTimeSlots(
+            @PathVariable Long storePK,
+            @RequestParam String date) {
+        return reservationService.getAvailableTimeSlots(storePK, date);
     }
 
 

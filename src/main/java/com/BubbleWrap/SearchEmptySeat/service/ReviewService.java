@@ -4,6 +4,7 @@ import com.BubbleWrap.SearchEmptySeat.dto.common.ApiResponse;
 import com.BubbleWrap.SearchEmptySeat.dto.common.ErrorCode;
 import com.BubbleWrap.SearchEmptySeat.dto.review.ReviewRequest;
 import com.BubbleWrap.SearchEmptySeat.dto.review.ReviewResponse;
+import com.BubbleWrap.SearchEmptySeat.dto.review.ReviewStatsResponse;
 import com.BubbleWrap.SearchEmptySeat.exception.BusinessException;
 import com.BubbleWrap.SearchEmptySeat.model.Member;
 import com.BubbleWrap.SearchEmptySeat.model.Review;
@@ -84,5 +85,53 @@ public class ReviewService {
                 .map(ReviewResponse::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(response, "Reviews fetched"));
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<ReviewStatsResponse>> getReviewStats(Long storePK) {
+        // 가게 존재 여부 확인
+        storeRepository.findById(storePK)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        // 총 리뷰 수
+        Long totalReviews = reviewRepository.countByStoreStorePK(storePK);
+
+        // 평균 평점 (DB에 0~10으로 저장되어 있으므로 0.0~5.0으로 변환)
+        Double averageRating = reviewRepository.findAverageRatingByStorePK(storePK);
+        if (averageRating == null) {
+            averageRating = 0.0;
+        } else {
+            averageRating = averageRating / 2.0; // 0~10을 0~5로 변환
+        }
+
+        // 각 평점별 리뷰 수 (DB에는 0~10으로 저장되어 있음)
+        // 1점 = 0~2, 2점 = 3~4, 3점 = 5~6, 4점 = 7~8, 5점 = 9~10
+        Long rating1Count = reviewRepository.countByStoreStorePKAndRating(storePK, 0) +
+                           reviewRepository.countByStoreStorePKAndRating(storePK, 1) +
+                           reviewRepository.countByStoreStorePKAndRating(storePK, 2);
+        
+        Long rating2Count = reviewRepository.countByStoreStorePKAndRating(storePK, 3) +
+                           reviewRepository.countByStoreStorePKAndRating(storePK, 4);
+        
+        Long rating3Count = reviewRepository.countByStoreStorePKAndRating(storePK, 5) +
+                           reviewRepository.countByStoreStorePKAndRating(storePK, 6);
+        
+        Long rating4Count = reviewRepository.countByStoreStorePKAndRating(storePK, 7) +
+                           reviewRepository.countByStoreStorePKAndRating(storePK, 8);
+        
+        Long rating5Count = reviewRepository.countByStoreStorePKAndRating(storePK, 9) +
+                           reviewRepository.countByStoreStorePKAndRating(storePK, 10);
+
+        ReviewStatsResponse stats = new ReviewStatsResponse(
+                totalReviews,
+                Math.round(averageRating * 10.0) / 10.0, // 소수점 첫째자리까지만
+                rating1Count,
+                rating2Count,
+                rating3Count,
+                rating4Count,
+                rating5Count
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(stats, "Review statistics fetched"));
     }
 }
